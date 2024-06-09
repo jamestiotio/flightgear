@@ -1023,7 +1023,7 @@ bool FGHIDDevice::parseUSBHIDDescriptor()
         {
             std::ostringstream byteString;
 
-            for (auto i=0; i<_rawXMLDescriptor.size(); ++i) {
+            for (size_t i = 0; i < _rawXMLDescriptor.size(); ++i) {
                 byteString << hexTable[_rawXMLDescriptor[i] >> 4];
                 byteString << hexTable[_rawXMLDescriptor[i] & 0x0f];
                 byteString << " ";
