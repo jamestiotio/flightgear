@@ -18,6 +18,14 @@ if(POLICY CMP0116)
     cmake_policy(SET CMP0116 NEW)
 endif()
 
+if(POLICY CMP0145)
+  cmake_policy(SET CMP0145 NEW)
+endif()
+
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
 message("CMAKE Build type: ${CMAKE_BUILD_TYPE}")
 # Set a default build type if none was specified
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)

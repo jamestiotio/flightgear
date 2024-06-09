@@ -63,9 +63,6 @@ endif()
 #-----------------------------------------------------------------------------
 # Set up all test suites as CTests.
 
-# Activation.
-include(Dart)
-
 # System test suites.
 add_test(AeroMeshSystemTests ${TESTSUITE_OUTPUT_DIR}/fgfs_test_suite --ctest -s AeroMeshTests)
 #add_test(GPSSystemTests ${TESTSUITE_OUTPUT_DIR}/fgfs_test_suite --ctest -s GPSTests)
