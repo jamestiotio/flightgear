@@ -1,5 +1,10 @@
-#ifndef __NASALSYS_HXX
-#define __NASALSYS_HXX
+// NasalSys.hxx -
+// SPDX-License-Identifier: GPL-2.0-or-later
+
+#pragma once
+
+#include <map>
+#include <memory>
 
 #include <simgear/math/SGMath.hxx> // keep before any cppbind include to enable
                                    // SGVec2<T> conversion.
@@ -11,13 +16,6 @@
 #include <simgear/structure/subsystem_mgr.hxx>
 #include <simgear/threads/SGQueue.hxx>
 
-// Required only for MSVC
-#ifdef _MSC_VER
-#   include <Scripting/NasalModelData.hxx>
-#endif
-
-#include <map>
-#include <memory>
 
 class FGNasalScript;
 class FGNasalListener;
@@ -233,27 +231,3 @@ private:
 
     static void logNasalStack(naContext context, string_list& stack);
 };
-
-#if 0
-class FGNasalScript
-{
-public:
-    ~FGNasalScript() { _nas->gcRelease(_gcKey); }
-
-    bool call() {
-        naRef n = naNil();
-        naCall(_nas->_context, _code, 0, &n, naNil(), naNil());
-        return naGetError(_nas->_context) == 0;
-    }
-
-    FGNasalSys* sys() const { return _nas; }
-
-private:
-    friend class FGNasalSys;
-    naRef _code;
-    int _gcKey;
-    FGNasalSys* _nas;
-};
-#endif
-
-#endif // __NASALSYS_HXX
