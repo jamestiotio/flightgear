@@ -31,7 +31,7 @@
 #include <simgear/misc/sg_path.hxx>
 #include <simgear/misc/sg_dir.hxx>
 #include <simgear/scene/util/SGReaderWriterOptions.hxx>
-#include <simgear/structure/OSGUtils.hxx>
+#include <simgear/scene/util/OsgUtils.hxx>
 #include <simgear/props/condition.hxx>
 
 #include "VRManager.hxx"
