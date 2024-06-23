@@ -21,10 +21,10 @@ class FGNasalScript;
 class FGNasalListener;
 class SGCondition;
 class FGNasalModelData;
-class NasalCommand;
+class TimerObj;
+class NasalSysPrivate;
+struct NasalTimer;
 class FGNasalModuleListener;
-struct NasalTimer;  ///< timer created by settimer
-class TimerObj;     ///< persistent timer created by maketimer
 
 namespace simgear { class BufferedLogCallback; }
 
@@ -118,11 +118,9 @@ public:
     void registerToUnload(FGNasalModelData* data);
 
     // can't call this 'globals' due to naming clash
-    naRef nasalGlobals() const
-    { return _globals; }
+    naRef nasalGlobals() const;
 
-    nasal::Hash getGlobals() const
-    { return nasal::Hash(_globals, _context); }
+    nasal::Hash getGlobals() const;
 
     // This mechanism is here to allow naRefs to be passed to
     // locations "outside" the interpreter.  Normally, such a
@@ -149,8 +147,7 @@ public:
 
     /// retrive the associated log object, for displaying log
     /// output somewhere (a UI, presumably)
-    simgear::BufferedLogCallback* log() const
-    { return _log.get(); }
+    simgear::BufferedLogCallback* log() const;
 
     string_list getAndClearErrorList();
 
@@ -163,7 +160,11 @@ public:
 
     bool reloadModuleFromFile(const std::string& moduleName);
 
+    // private methods: the class has a lot of friends to allow particular classes
+    // to do book-keeping, this is not ideal.
 private:
+    friend FGNasalModuleListener;
+
     void initLogLevelConstants();
 
     void loadPropertyScripts();
@@ -176,43 +177,10 @@ private:
                std::string& errors);
     naRef genPropsModule();
 
+    friend TimerObj;
 
-private:
-    //friend class FGNasalScript;
-    friend class FGNasalListener;
-    friend class FGNasalModuleListener;
-    SGLockedQueue<SGSharedPtr<FGNasalModelData> > _loadList;
-    SGLockedQueue<SGSharedPtr<FGNasalModelData> > _unloadList;
-    // Delay removing items of the _loadList to ensure the are already attached
-    // to the scene graph (eg. enables to retrieve world position in load
-    // callback).
-    bool _delay_load;
-
-    // Listener
-    std::map<int, FGNasalListener *> _listener;
-    std::vector<FGNasalListener *> _dead_listener;
-
-    std::vector<FGNasalModuleListener*> _moduleListeners;
-
-    static int _listenerId;
-
-    bool _inited;
-    naContext _context;
-    naRef _globals,
-          _string;
-
-    SGPropertyNode_ptr _cmdArg;
-
-    std::unique_ptr<simgear::BufferedLogCallback> _log;
-
-    typedef std::map<std::string, NasalCommand*> NasalCommandDict;
-    NasalCommandDict _commands;
-
-    naRef _wrappedNodeFunc;
-
-    // track NasalTimer instances (created via settimer() call) -
-    // this allows us to clean these up on shutdown
-    std::vector<NasalTimer*> _nasalTimers;
+    void addPersistentTimer(TimerObj* pto);
+    void removePersistentTimer(TimerObj* obj);
 
     // NasalTimer is a friend to invoke handleTimer and do the actual
     // dispatch of the settimer-d callback
@@ -220,14 +188,9 @@ private:
 
     void handleTimer(NasalTimer* t);
 
-    // track persistent timers. These are owned from the Nasal side, so we
-    // only track a non-owning reference here.
-    std::vector<TimerObj*> _persistentTimers;
-
-    friend TimerObj;
-
-    void addPersistentTimer(TimerObj* pto);
-    void removePersistentTimer(TimerObj* obj);
-
     static void logNasalStack(naContext context, string_list& stack);
+
+    // members: should only be the d-ptr
+private:
+    std::unique_ptr<NasalSysPrivate> d;
 };
