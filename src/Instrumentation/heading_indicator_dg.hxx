@@ -42,6 +42,7 @@
  *   new-default-power-path: use /systems/electrical/outputs/"name"[ number ] instead of 
  *                           /systems/electrical/outputs/DG as the default power
  *                           supply path (not used when power-supply is set)
+ *   heading-source          If given, heading is taken from this node (default: "/orientation/heading-deg")
  *   power-supply
  *   minimum-supply-volts
  *   suction                 If given, gyro is vacuum driven from the property given
@@ -51,6 +52,7 @@
  * These are optional and also configurable at runtime below instruments limits subtree:
  *   minimum-vacuum                 Default 5.0 inHG
  *   gyro/minimum-spin-norm         Default 0.9 (0.0 to 1.0)
+ *   limits/yaw-rate-source         Default: "/orientation/yaw-rate-degps"
  *   limits/yaw-error-factor        Default 0.033  (set to 0 to disable yaw-error influence)
  *   limits/yaw-limit-rate          Default 5.0
  *   limits/g-node                  Path to g-node; default "/accelerations/pilot-g"
@@ -84,6 +86,8 @@ private:
     std::string _powerSupplyPath;
     std::string _suctionPath;
     std::string _gnodePath;
+    std::string _heading_in_nodePath;
+    std::string _yaw_rate_nodePath;
     bool _vacuumDriven = false;
 
     SGPropertyNode_ptr _limits_node;

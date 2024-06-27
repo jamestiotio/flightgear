@@ -40,12 +40,15 @@ HeadingIndicatorDG::HeadingIndicatorDG(SGPropertyNode* node) : _last_heading_deg
         _minVacuum = node->getDoubleValue("minimum-vacuum", _minVacuum);
     }
 
+    _heading_in_nodePath = node->getStringValue("heading-source", "/orientation/heading-deg");
+
     SGPropertyNode* gyro_cfg = node->getChild("gyro", 0, true);
     _minSpin = gyro_cfg->getDoubleValue("minimum-spin-norm", 0.9);
     _gyro_spin_up = gyro_cfg->getDoubleValue("spin-up-sec", 4.0);
     _gyro_spin_down = gyro_cfg->getDoubleValue("spin-down-sec", 180.0);
 
     SGPropertyNode* limits_cfg = node->getChild("limits", 0, true);
+    _yaw_rate_nodePath = limits_cfg->getStringValue("yaw-rate-source", "/orientation/yaw-rate-degps");
     _yaw_error_factor = limits_cfg->getDoubleValue("yaw-error-factor", 0.033);
     _yaw_limit_rate = limits_cfg->getDoubleValue("yaw-limit-rate", 5.0);
     _g_error_factor = limits_cfg->getDoubleValue("g-error-factor", 0.033);
@@ -66,8 +69,8 @@ HeadingIndicatorDG::init ()
 {
     std::string branch = nodePath();
 
-    _heading_in_node = fgGetNode("/orientation/heading-deg", true);
-    _yaw_rate_node   = fgGetNode("/orientation/yaw-rate-degps", true);
+    _heading_in_node = fgGetNode(_heading_in_nodePath, true);
+    _yaw_rate_node   = fgGetNode(_yaw_rate_nodePath, true);
     _g_node = fgGetNode(_gnodePath, true);
     _we_speed_node = fgGetNode("/velocities/east-relground-fps", true);
 
