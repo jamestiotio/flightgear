@@ -53,6 +53,7 @@
  *   gyro/minimum-spin-norm         Default 0.9 (0.0 to 1.0)
  *   limits/yaw-error-factor        Default 0.033  (set to 0 to disable yaw-error influence)
  *   limits/yaw-limit-rate          Default 5.0
+ *   limits/g-node                  Path to g-node; default "/accelerations/pilot-g"
  *   limits/g-error-factor          Default 0.033  (set to 0 to disable g-error influence)
  *   limits/g-limit-lower           Default -0.5
  *   limits/g-limit-upper           Default  1.5
@@ -82,6 +83,7 @@ private:
 
     std::string _powerSupplyPath;
     std::string _suctionPath;
+    std::string _gnodePath;
     bool _vacuumDriven = false;
 
     SGPropertyNode_ptr _limits_node;

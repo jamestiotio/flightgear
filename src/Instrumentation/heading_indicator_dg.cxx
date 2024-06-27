@@ -49,6 +49,7 @@ HeadingIndicatorDG::HeadingIndicatorDG(SGPropertyNode* node) : _last_heading_deg
     _yaw_error_factor = limits_cfg->getDoubleValue("yaw-error-factor", 0.033);
     _yaw_limit_rate = limits_cfg->getDoubleValue("yaw-limit-rate", 5.0);
     _g_error_factor = limits_cfg->getDoubleValue("g-error-factor", 0.033);
+    _gnodePath     = limits_cfg->getStringValue("g-node", "/accelerations/pilot-g");
     _g_limit_lower = limits_cfg->getDoubleValue("g-limit-lower", -0.5);
     _g_limit_upper = limits_cfg->getDoubleValue("g-limit-upper", 1.5);
     _g_limit_tumble = limits_cfg->getDoubleValue("g-limit-tumble-factor", 1.5);
@@ -67,7 +68,7 @@ HeadingIndicatorDG::init ()
 
     _heading_in_node = fgGetNode("/orientation/heading-deg", true);
     _yaw_rate_node   = fgGetNode("/orientation/yaw-rate-degps", true);
-    _g_node = fgGetNode("/accelerations/pilot-g", true);
+    _g_node = fgGetNode(_gnodePath, true);
     _we_speed_node = fgGetNode("/velocities/east-relground-fps", true);
 
     SGPropertyNode *node    = fgGetNode(branch, true );
