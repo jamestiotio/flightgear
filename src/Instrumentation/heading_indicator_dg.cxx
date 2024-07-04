@@ -53,6 +53,7 @@ HeadingIndicatorDG::HeadingIndicatorDG(SGPropertyNode* node) : _last_heading_deg
     _yaw_limit_rate = limits_cfg->getDoubleValue("yaw-limit-rate", 5.0);
     _g_error_factor = limits_cfg->getDoubleValue("g-error-factor", 0.033);
     _gnodePath     = limits_cfg->getStringValue("g-node", "/accelerations/pilot-g");
+    _g_filtertime = limits_cfg->getDoubleValue("g-filter-time", 10.0);
     _g_limit_lower = limits_cfg->getDoubleValue("g-limit-lower", -0.5);
     _g_limit_upper = limits_cfg->getDoubleValue("g-limit-upper", 1.5);
     _g_limit_tumble = limits_cfg->getDoubleValue("g-limit-tumble-factor", 1.5);
@@ -101,6 +102,7 @@ HeadingIndicatorDG::init ()
     SGPropertyNode* limits_node = node->getChild("limits", 0, true);
     _yaw_error_factor_node = limits_node->getChild("yaw-error-factor", 0, true);
     _yaw_limit_rate_node = limits_node->getChild("yaw-limit-rate", 0, true);
+    _g_filtertime_node = limits_node->getChild("g-filter-time", 0.0, true);
     _g_error_factor_node = limits_node->getChild("g-error-factor", 0, true);
     _g_limit_lower_node = limits_node->getChild("g-limit-lower", 0, true);
     _g_limit_upper_node = limits_node->getChild("g-limit-upper", 0, true);
@@ -133,10 +135,12 @@ HeadingIndicatorDG::reinit (void)
 
     _yaw_error_factor_node->setDoubleValue(_yaw_error_factor);
     _yaw_limit_rate_node->setDoubleValue(_yaw_limit_rate);
+    _g_filtertime_node->setDoubleValue(_g_filtertime);
     _g_error_factor_node->setDoubleValue(_g_error_factor);
     _g_limit_lower_node->setDoubleValue(_g_limit_lower);
     _g_limit_upper_node->setDoubleValue(_g_limit_upper);
     _g_limit_tumble_node->setDoubleValue(_g_limit_tumble);
+    _last_g = _g_node->getDoubleValue();
 
     _tumble_flag_node->setBoolValue(0);
     _tumble_node->setDoubleValue(0.0);
@@ -240,6 +244,11 @@ HeadingIndicatorDG::update (double dt)
     _g_limit_lower = _g_limit_lower_node->getDoubleValue();
     _g_limit_upper = _g_limit_upper_node->getDoubleValue();
     double g = _g_node->getDoubleValue();
+    _g_filtertime = _g_filtertime_node->getDoubleValue();
+    if (_g_filtertime > 0.0) {
+        g = fgGetLowPass(_last_g, g, dt * _g_filtertime);
+    }
+    _last_g = g;
     if (g > _g_limit_upper || g < _g_limit_lower) {
         error += _g_error_factor * g * dt * factor;
     }
