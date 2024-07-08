@@ -9,6 +9,8 @@
 #include <Main/globals.hxx>
 #include <utility>
 
+namespace flightgear::swift {
+
 FGSwiftAircraftManager::FGSwiftAircraftManager()
 {
     m_initialized = true;
@@ -94,8 +96,8 @@ void FGSwiftAircraftManager::removeAllPlanes()
 {
     for (auto it = aircraftByCallsign.begin(); it != aircraftByCallsign.end();) {
         it->second->setDie(true);
-        it = aircraftByCallsign.erase(it);
     }
+    aircraftByCallsign.clear();
 }
 
 double FGSwiftAircraftManager::getElevationAtPosition(const std::string& callsign, const SGGeod& pos) const
@@ -127,3 +129,5 @@ void FGSwiftAircraftManager::setPlanesSurfaces(const std::vector<AircraftSurface
         }
     }
 }
+
+} // namespace flightgear::swift
