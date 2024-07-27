@@ -94,8 +94,8 @@ void FGSwiftAircraftManager::removePlane(const std::string& callsign)
 
 void FGSwiftAircraftManager::removeAllPlanes()
 {
-    for (auto it = aircraftByCallsign.begin(); it != aircraftByCallsign.end();) {
-        it->second->setDie(true);
+    for (const auto &[_, plane] : aircraftByCallsign) {
+        plane->setDie(true);
     }
     aircraftByCallsign.clear();
 }
