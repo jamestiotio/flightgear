@@ -58,6 +58,8 @@ MagCompass::init ()
     _y_accel_node = fgGetNode("/accelerations/pilot/y-accel-fps_sec", true);
     _z_accel_node = fgGetNode("/accelerations/pilot/z-accel-fps_sec", true);
     _out_node = node->getChild("indicated-heading-deg", 0, true);
+    _roll_out_node = node->getChild("roll-deg", 0, true);
+    _pitch_out_node = node->getChild("pitch-deg", 0, true);
 
     reinit();
 }
@@ -147,6 +149,15 @@ MagCompass::update (double delta_time_sec)
 
     theta -= 0.07 * x_accel_g;
     phi -= 0.07 * y_accel_g;
+    
+    // Expose pitch of the disc
+    double d = -_z_accel_node->getDoubleValue();
+    if (d < 1.0) d = 1.0;
+    double x_factor_norm = _x_accel_node->getDoubleValue() / d * 10.0;
+    double y_factor_norm = _y_accel_node->getDoubleValue() / d * 10.0;
+    _roll_out_node->setDoubleValue(phi * SGD_RADIANS_TO_DEGREES * abs(y_factor_norm));
+    _pitch_out_node->setDoubleValue(-theta * SGD_RADIANS_TO_DEGREES * abs(x_factor_norm));
+    
     
     ////////////////////////////////////////////////////////////////////
     // calculate target compass heading degrees

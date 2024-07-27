@@ -39,6 +39,8 @@
  * Output properties:
  *
  * /instrumentation/"name"/indicated-heading-deg
+ * /instrumentation/"name"/pitch-deg
+ * /instrumentation/"name"/roll-deg
  */
 class MagCompass : public SGSubsystem
 {
@@ -74,4 +76,6 @@ private:
     SGPropertyNode_ptr _y_accel_node;
     SGPropertyNode_ptr _z_accel_node;
     SGPropertyNode_ptr _out_node;
+    SGPropertyNode_ptr _roll_out_node;
+    SGPropertyNode_ptr _pitch_out_node;
 };
