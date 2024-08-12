@@ -41,6 +41,10 @@
  * /instrumentation/"name"/indicated-heading-deg
  * /instrumentation/"name"/pitch-deg
  * /instrumentation/"name"/roll-deg
+ *
+ * Config properties:
+ * /instrumentation/"name"/fluid-viscosity
+ *
  */
 class MagCompass : public SGSubsystem
 {
@@ -60,6 +64,8 @@ public:
 private:
     double _rate_degps;
 
+    double _last_pitch, _last_roll, _cfg_viscosity;
+
     std::string _name;
     int _num;
     SGSharedPtr<SGInterpTable> _deviation_table;
@@ -75,6 +81,7 @@ private:
     SGPropertyNode_ptr _x_accel_node;
     SGPropertyNode_ptr _y_accel_node;
     SGPropertyNode_ptr _z_accel_node;
+    SGPropertyNode_ptr _fluid_viscosity;
     SGPropertyNode_ptr _out_node;
     SGPropertyNode_ptr _roll_out_node;
     SGPropertyNode_ptr _pitch_out_node;
