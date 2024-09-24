@@ -451,7 +451,15 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "Ap
     set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DNDEBUG")
     set(CMAKE_C_FLAGS_RELWITHDEBINFO  "-O3 -g -DNDEBUG")
 
-    set(SIMD_COMPILER_FLAGS "-msse2 -mfpmath=sse -ftree-vectorize -ftree-slp-vectorize")
+    if(CMAKE_OSX_ARCHITECTURES MATCHES "x86_64")
+      set(SIMD_COMPILER_FLAGS "-msse2 -mfpmath=sse")
+    elseif(CMAKE_OSX_ARCHITECTURES MATCHES "arm64")
+      # set(SIMD_COMPILER_FLAGS "-mfpmath=vfp4")
+    elseif(X86 OR X86_64)
+      set(SIMD_COMPILER_FLAGS "-msse2 -mfpmath=sse")
+    endif()
+    set(SIMD_COMPILER_FLAGS "${SIMD_COMPILER_FLAGS} -ftree-vectorize -ftree-slp-vectorize")
+    
     set(WARNING_FLAGS_C "-Wall")
 endif()
 
