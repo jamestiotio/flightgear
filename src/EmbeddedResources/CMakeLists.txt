@@ -2,6 +2,11 @@ add_executable(fgrcc fgrcc.cxx fgrcc.hxx)
 target_link_libraries(fgrcc SimGearCore)
 
 # On Windows, make sure fgrcc can be run (it needs third-party libraries) in add_custom_target
+# note this only works when using the Visual Studio generators, and *not* when using Ninja
+# for Ninja, easiest fix is to ensure the Windows-3rd-party bin dir is in PATH. 
+# https://stackoverflow.com/questions/35029277/how-to-modify-environment-variables-passed-to-custom-cmake-target
+# Even better would be to use cmake -E env fgrcc, but this is currently fighting me.
+
 if(MSVC)
   set_target_properties(fgrcc PROPERTIES DEBUG_POSTFIX d)
     if (FINAL_MSVC_3RDPARTY_DIR)
