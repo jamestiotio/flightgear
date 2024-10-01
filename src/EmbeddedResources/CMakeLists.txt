@@ -9,11 +9,15 @@ target_link_libraries(fgrcc SimGearCore)
 
 if(MSVC)
   set_target_properties(fgrcc PROPERTIES DEBUG_POSTFIX d)
-    if (FINAL_MSVC_3RDPARTY_DIR)
-      set(CMAKE_MSVCIDE_RUN_PATH ${FINAL_MSVC_3RDPARTY_DIR}/bin)
-    else()
-      message(FATAL_ERROR "FINAL_MSVC_3RDPARTY_DIR is empty or unset")
-    endif()
+  if (FINAL_MSVC_3RDPARTY_DIR)
+    set(CMAKE_MSVCIDE_RUN_PATH ${FINAL_MSVC_3RDPARTY_DIR}/bin)
+  else()
+    message(FATAL_ERROR "FINAL_MSVC_3RDPARTY_DIR is empty or unset")
+  endif()
+
+  if (CMAKE_GENERATOR MATCHES "Ninja*")
+    message(WARNING "Ninja generator in use on Windows, ensure PATH is set to include zlib.dll or FGRCC will fail to run.")
+  endif()
 endif()
 
 add_custom_command(
