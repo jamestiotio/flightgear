@@ -25,6 +25,9 @@ linux-build:
       -D CMAKE_PREFIX_PATH=$CI_PROJECT_DIR/simgear-dist
     - cmake --build $BUILD_DIR
     - cmake --build $BUILD_DIR --target install
+    # running here because otherwise we would need to cache/save the whole build tree
+    # maybe can be improved with cache kesy shared between the jobs?
+    - ctest --test-dir $BUILD_DIR 
   artifacts:
     paths:
       - dist
@@ -33,7 +36,9 @@ linux-build:
       job: linux-build
       artifacts: true
       ref: next
-
+  cache:
+    paths:
+      - $BUILD_DIR
 
 windows-build:
   stage: build
@@ -167,14 +172,14 @@ macos-x64-build:
       - $BUILD_DIR
 
 # run tests using the binary built before
-test:
-  image: registry.gitlab.com/flightgear/flightgear
-  stage: test
-  needs:
-    - job: linux-build
-  script:
-    - cd $BUILD_DIR
-    - ls
-    - ./bin/fgfs_test_suite
+# test:
+#   image: registry.gitlab.com/flightgear/flightgear
+#   stage: test
+#   needs:
+#     - job: linux-build
+#   script:
+#     - cd $BUILD_DIR
+#     - ls
+    
 
 
