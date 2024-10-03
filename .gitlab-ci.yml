@@ -20,6 +20,8 @@ linux-build:
   rules:
     - if: $CI_PIPELINE_SOURCE != "schedule"
   script:
+    - rm $BUILD_DIR/CMakeCache.txt
+    # --fresh would be ideal here
     - cmake -B $BUILD_DIR -S $CI_PROJECT_DIR -G Ninja 
       -D CMAKE_BUILD_TYPE=RelWithDebInfo 
       -D CMAKE_INSTALL_PREFIX=$PREFIX_DIR
@@ -55,7 +57,6 @@ windows-build:
   # CMake gets sad.
     - Move-Item -Path $CI_PROJECT_DIR\boost $WIN_FG_DIR\boost
     - Move-Item -Path $CI_PROJECT_DIR\msvc140 $WIN_FG_DIR\msvc140
-    # - ls $env:CI_PROJECT_DIR
 
   script:
     # should ideally be done inside CMake but this works for now
@@ -64,6 +65,7 @@ windows-build:
 
     - cmake -B $env:BUILD_DIR -S $env:CI_PROJECT_DIR 
       -G \"Visual Studio 17 2022\" -A x64
+      --fresh
       -D CMAKE_BUILD_TYPE=RelWithDebInfo
       -D CMAKE_INSTALL_PREFIX=$env:PREFIX_DIR
       -D MSVC_3RDPARTY_ROOT=$WIN_FG_DIR
@@ -104,9 +106,8 @@ macos-build:
     # ensure we use our FreeType and not the one from Homebrew
     # ours is UB, HomeBrew's is not
     - export FREETYPE_DIR=$CI_PROJECT_DIR/dist
-    - ls $CI_PROJECT_DIR/simgear-dist/lib
     - cmake -B $BUILD_DIR -S $CI_PROJECT_DIR -G Ninja 
-      --debug-find-pkg=SimGear
+      --fresh
       -D CMAKE_BUILD_TYPE=RelWithDebInfo 
       -D CMAKE_INSTALL_PREFIX=$PREFIX_DIR
       -D CMAKE_OSX_ARCHITECTURES=arm64
@@ -150,6 +151,7 @@ macos-x64-build:
     # ours is UB, HomeBrew's is not
     - export FREETYPE_DIR=$CI_PROJECT_DIR/dist
     - cmake -B $BUILD_DIR -S $CI_PROJECT_DIR -G Ninja 
+      --fresh
       -D CMAKE_BUILD_TYPE=RelWithDebInfo 
       -D CMAKE_INSTALL_PREFIX=$PREFIX_DIR
       -D CMAKE_OSX_ARCHITECTURES=x86_64
