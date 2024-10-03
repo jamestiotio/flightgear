@@ -17,8 +17,6 @@ variables:
 linux-build:
   image: registry.gitlab.com/flightgear/flightgear
   stage: build
-  rules:
-    - if: $CI_PIPELINE_SOURCE != "schedule"
   script:
     - rm $BUILD_DIR/CMakeCache.txt
     # --fresh would be ideal here
@@ -28,9 +26,6 @@ linux-build:
       -D CMAKE_PREFIX_PATH=$CI_PROJECT_DIR/simgear-dist;$CI_PROJECT_DIR/osg-dist
     - cmake --build $BUILD_DIR
     - cmake --build $BUILD_DIR --target install
-    # running here because otherwise we would need to cache/save the whole build tree
-    # maybe can be improved with cache kesy shared between the jobs?
-    - ctest --test-dir $BUILD_DIR 
   artifacts:
     paths:
       - dist
@@ -96,8 +91,6 @@ macos-build:
   tags:
     - saas-macos-medium-m1
   image: $MAC_IMAGE
-  rules:
-    - if: $CI_PIPELINE_SOURCE != "schedule"
   before_script:
       - export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
       - export HOMEBREW_NO_INSTALL_CLEANUP=1
@@ -140,8 +133,6 @@ macos-x64-build:
   tags:
     - saas-macos-medium-m1
   image: $MAC_IMAGE
-  rules:
-    - if: $CI_PIPELINE_SOURCE != "schedule"
   before_script:
       - export HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK=1
       - export HOMEBREW_NO_INSTALL_CLEANUP=1
@@ -179,15 +170,16 @@ macos-x64-build:
     paths:
       - $BUILD_DIR
 
-# run tests using the binary built before
-# test:
-#   image: registry.gitlab.com/flightgear/flightgear
-#   stage: test
-#   needs:
-#     - job: linux-build
-#   script:
-#     - cd $BUILD_DIR
-#     - ls
-    
+test:
+  image: registry.gitlab.com/flightgear/flightgear
+  stage: test
+  script:
+    - cd $BUILD_DIR
+    - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CI_PROJECT_DIR/osg-dist/lib
+    - ls test_suite
+    - ./test_suite/fgfs_test_suite
+  cache:
+    paths:
+      - $BUILD_DIR
 
 
