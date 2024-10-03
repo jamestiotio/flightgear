@@ -18,8 +18,8 @@ linux-build:
   image: registry.gitlab.com/flightgear/flightgear
   stage: build
   script:
-    - rm $BUILD_DIR/CMakeCache.txt
-    # --fresh would be ideal here
+    - rm -f $BUILD_DIR/CMakeCache.txt
+    # --fresh would be ideal here to avoid the line above, but needs CMake 3.25
     - cmake -B $BUILD_DIR -S $CI_PROJECT_DIR -G Ninja 
       -D CMAKE_BUILD_TYPE=RelWithDebInfo 
       -D CMAKE_INSTALL_PREFIX=$PREFIX_DIR
@@ -59,7 +59,7 @@ windows-build:
     - $Env:PATH += ";$WIN_FG_DIR\msvc140\3rdparty.x64\bin"
 
     - cmake -B $env:BUILD_DIR -S $env:CI_PROJECT_DIR 
-      -G \"Visual Studio 17 2022\" -A x64
+      -G "Visual Studio 17 2022" -A x64
       --fresh
       -D CMAKE_BUILD_TYPE=RelWithDebInfo
       -D CMAKE_INSTALL_PREFIX=$env:PREFIX_DIR
