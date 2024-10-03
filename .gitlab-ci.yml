@@ -8,7 +8,6 @@ variables:
   PREFIX_DIR: "$CI_PROJECT_DIR/dist"
   OSG_REF: fgfs-osg-36-2
   BRANCH_REF: next
-
   # create a root dir *above* the Simgear checkout, otherwise CMake
   # complains about INTERFACE_INCLUDE_DIRECTORIES being the source dir
   WIN_FG_DIR: $CI_BUILDS_DIR\flightgear
@@ -63,7 +62,8 @@ windows-build:
     # 
     - $Env:PATH += ";$WIN_FG_DIR\msvc140\3rdparty.x64\bin"
 
-    - cmake -B $env:BUILD_DIR -S $env:CI_PROJECT_DIR -G Ninja 
+    - cmake -B $env:BUILD_DIR -S $env:CI_PROJECT_DIR 
+      -G \"Visual Studio 17 2022\" -A x64
       -D CMAKE_BUILD_TYPE=RelWithDebInfo
       -D CMAKE_INSTALL_PREFIX=$env:PREFIX_DIR
       -D MSVC_3RDPARTY_ROOT=$WIN_FG_DIR
