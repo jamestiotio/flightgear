@@ -184,6 +184,10 @@ test:
       job: create-test-data
       ref: $BRANCH_REF
       artifacts: true
+    - project: flightgear/openscenegraph
+      job: linux-build
+      ref: $OSG_REF
+      artifacts: true
   cache:
     paths:
       - $BUILD_DIR
