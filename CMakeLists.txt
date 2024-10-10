@@ -349,11 +349,13 @@ endif()
 ##############################################################################
 ## Qt5 setup setup
 if (ENABLE_QT)
-
-    find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core)
-    find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Gui Network Qml Quick Svg)
-
-    if (Qt${QT_VERSION_MAJOR}Widgets_FOUND)
+    find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
+    if (QT_FOUND)
+        find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets Gui Network Qml Quick Svg)
+        if (NOT Qt${QT_VERSION_MAJOR}Widgets_FOUND)
+            message(FATAL_ERROR "Qt support enabled, Qt was found but some required packages are missing, stopping.")
+        endif()
+    
         set(HAVE_QT 1)
         include (Translations)
 
@@ -368,11 +370,12 @@ if (ENABLE_QT)
         
         message(STATUS "Qt GUI enabled, found Qt at: ${FG_QT_ROOT_DIR}")
     else()
-        message(STATUS "Qt GUI disabled, Qt/qmake not found in PATH/CMAKE_PREFIX_PATH")
+        message(STATUS "Qt support disabled, Qt/qmake not found in PATH/CMAKE_PREFIX_PATH")
         # don't try to build FGQCanvas if Qt wasn't found correctly
         set(ENABLE_FGQCANVAS OFF)
     endif()
 else()
+    set(HAVE_QT 0)
     set(ENABLE_FGQCANVAS OFF)
 endif (ENABLE_QT)
 
