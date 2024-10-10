@@ -10,6 +10,10 @@ if (TARGET sentry_crashpad::handler)
     endif()
 endif()
 
+if (HAVE_QT)
+    include (QtDeployment)
+endif()
+
 #-----------------------------------------------------------------------------
 ### uninstall target
 #-----------------------------------------------------------------------------
