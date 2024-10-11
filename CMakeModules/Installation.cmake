@@ -14,12 +14,20 @@ if (HAVE_QT)
     include (QtDeployment)
 endif()
 
+
+if (MSVC)
+    set(OSG_PLUGIN_SUFFIX "bin")
+else()
+    set(OSG_PLUGIN_SUFFIX "lib")
+endif()
+
 find_path(OSG_PLUGINS_DIR
     NAMES osgPlugins 
         osgPlugins-${OPENSCENEGRAPH_VERSION}
     PATHS 
         ${FINAL_MSVC_3RDPARTY_DIR}
-    PATH_SUFFIXES lib
+    PATH_SUFFIXES
+        ${OSG_PLUGIN_SUFFIX}
 )
 
 if (NOT OSG_PLUGINS_DIR)
