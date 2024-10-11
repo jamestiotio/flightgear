@@ -14,6 +14,32 @@ if (HAVE_QT)
     include (QtDeployment)
 endif()
 
+find_path(OSG_PLUGINS_DIR
+    NAMES osgPlugins 
+        osgPlugins-${OPENSCENEGRAPH_VERSION}
+    PATH_SUFFIXES lib
+)
+
+if (NOT OSG_PLUGINS_DIR)
+    message(FATAL_ERROR "Couldn't find osgPlugins directory")
+endif()
+
+message(STATUS "OSG plugins at: ${OSG_PLUGINS_DIR}/osgPlugins")
+
+if (APPLE)
+    # OSG libs
+
+    # OSG plugins
+    install(DIRECTORY ${OSG_PLUGINS_DIR}/osgPlugins DESTINATION $<TARGET_BUNDLE_CONTENT_DIR:fgfs>/PlugIns)
+
+    # add extra utilites to the bundle
+    install(TARGETS fgcom fgjs fgelev DESTINATION $<TARGET_BUNDLE_CONTENT_DIR:fgfs>/MacOS)
+
+    # FIXME: this copies the fully version file name, need to rename to the non-versioned one
+    install(FILES $<TARGET_FILE:OpenAL::OpenAL> DESTINATION $<TARGET_BUNDLE_CONTENT_DIR:fgfs>/Frameworks)
+endif()
+ 
+
 #-----------------------------------------------------------------------------
 ### uninstall target
 #-----------------------------------------------------------------------------
