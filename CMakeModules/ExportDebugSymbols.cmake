@@ -30,6 +30,7 @@ set(CMAKE_MSVCIDE_RUN_PATH "${_msvc_3rdparty_bin_dir}")
 
 add_custom_target(upload_debug_symbols
     COMMENT "Uploading debug symbols via sentry-cli"
+    COMMAND ${CMAKE_COMMAND} -E echo $ENV{SENTRY_AUTH_TOKEN}
     COMMAND sentry-cli upload-dif --org flightgear --project flightgear ${CMAKE_BINARY_DIR}/symbols
 ) 
 
