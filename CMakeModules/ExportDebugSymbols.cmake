@@ -7,9 +7,8 @@ add_custom_target(
 
 function(export_debug_symbols target)
 
-
     if (APPLE)
-              # workaround because we adjust the bundle name in some cases, and
+        # workaround because we adjust the bundle name in some cases, and
         # TARGET_FILE seems to have a bug of assuming the executable name matches
         if (isBundle) 
             add_custom_target(${target}.dSYM
@@ -44,12 +43,18 @@ endfunction()
 file(TO_NATIVE_PATH "${FINAL_MSVC_3RDPARTY_DIR}/bin" _msvc_3rdparty_bin_dir)
 set(CMAKE_MSVCIDE_RUN_PATH "${_msvc_3rdparty_bin_dir}")
 
-add_custom_target(upload_debug_symbols
-    COMMENT "Uploading debug symbols via sentry-cli"
-    COMMAND ${CMAKE_COMMAND} -E echo $ENV{SENTRY_AUTH_TOKEN}
-    COMMAND sentry-cli upload-dif --org flightgear --project flightgear ${CMAKE_BINARY_DIR}/symbols
-) 
+if (FG_BUILD_TYPE STREQUAL "Release")
+    add_custom_target(upload_debug_symbols
+        COMMENT "Uploading debug symbols via sentry-cli"
+        COMMAND sentry-cli upload-dif --org flightgear --project flightgear ${CMAKE_BINARY_DIR}/symbols
+    ) 
 
+    add_dependencies(upload_debug_symbols debug_symbols)
+else()
+    # make a dummy target to keep CI simple, but it doesn't do anything
+    add_custom_target(upload_debug_symbols
+        COMMENT "Non-release FG_BUILD_TYPE: symbol upload is disabled"
+    ) 
+endif()
 
-add_dependencies(upload_debug_symbols debug_symbols)
 
