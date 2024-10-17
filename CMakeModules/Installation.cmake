@@ -75,7 +75,7 @@ string(TIMESTAMP iss_config_timestamp)
 
 #if (MSVC)
     configure_file(${CMAKE_SOURCE_DIR}/package/windows/BuildConfig.iss.in ${CMAKE_BINARY_DIR}/BuildConfig.iss)
-    install(FILES ${CMAKE_BINARY_DIR}/BuildConfig.iss DESTINATION .)
+    install(FILES ${CMAKE_BINARY_DIR}/BuildConfig.iss DESTINATION . COMPONENT packaging)
 #endif()
 
 if (APPLE)
@@ -98,6 +98,15 @@ if (APPLE)
     install(FILES ${CMAKE_SOURCE_DIR}/package/mac/FlightGear.icns DESTINATION $<TARGET_BUNDLE_CONTENT_DIR:fgfs>/Resources)
 endif()
  
+########################################################################################
+# AppDir creation for Linux AppImage
+
+if (LINUX)
+    
+    install(DIRECTORY ${OSG_PLUGINS_DIR}/osgPlugins DESTINATION appdir/usr/lib COMPONENT packaging)
+    install(TARGETS fgcom fgjs fgelev fgfs DESTINATION appdir/usr/bin COMPONENT packaging)
+endif()
+
 
 #-----------------------------------------------------------------------------
 ### uninstall target
