@@ -568,6 +568,9 @@ add_dependencies(fgfsObjects buildId)
 # remove once we use CMake 3.12, since then the dependency will be explicit
 add_dependencies(fgfsObjects fgembeddedresources)
 
+target_precompile_headers(fgfsObjects PRIVATE 
+        "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_SOURCE_DIR}/src/Include/flightgear_precompile.h>")
+
 ########################################################################
 
 add_subdirectory(3rdparty)

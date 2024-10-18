@@ -265,3 +265,13 @@ endif()
 
 
 flightgear_component(GUI "${SOURCES}" "${HEADERS}")
+
+if (APPLE)
+    # PCH doesn't work for Objective-C++
+    set_property(SOURCE 
+          FGCocoaMenuBar.mm CocoaFileDialog.mm CocoaMouseCursor.mm CocoaHelpers.mm
+        TARGET_DIRECTORY fgfsObjects
+        PROPERTY 
+          SKIP_PRECOMPILE_HEADERS ON)
+
+endif()

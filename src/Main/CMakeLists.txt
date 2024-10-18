@@ -95,6 +95,9 @@ if(APPLE)
     setup_fgfs_bundle(fgfs)
 endif()
 
+target_precompile_headers(fgfs PRIVATE 
+        "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_SOURCE_DIR}/src/Include/flightgear_precompile.h>")
+
 # Set up the target links.
 setup_fgfs_libraries(fgfs)
 export_debug_symbols(fgfs)
