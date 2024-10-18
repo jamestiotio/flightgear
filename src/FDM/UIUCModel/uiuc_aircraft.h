@@ -149,8 +149,6 @@
 #include "uiuc_parsefile.h"
 #include "uiuc_flapdata.h"
 
-typedef ::stack :: iterator LIST;
-
 /* Add more keywords here if required*/
 enum {init_flag = 1000, geometry_flag, controlSurface_flag, controlsMixer_flag, 
       mass_flag, engine_flag, CD_flag, CL_flag, Cm_flag, CY_flag, Cl_flag, 

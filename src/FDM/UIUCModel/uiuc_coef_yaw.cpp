@@ -92,14 +92,14 @@ void uiuc_coef_yaw()
 {
   std::string linetoken1;
   std::string linetoken2;
-  stack command_list;
+  uiuc_stack command_list;
 
   double p_nondim;
   double r_nondim;
 
   command_list = aeroYawParts -> getCommands();
   
-  for (LIST command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
+  for (auto command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
     {
       linetoken1 = aeroYawParts -> getToken(*command_line, 1);
       linetoken2 = aeroYawParts -> getToken(*command_line, 2);

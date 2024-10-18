@@ -12,13 +12,13 @@
 
 #define MAXLINE 400   // Max size of the line of the input file
 
-typedef std::list<std::string> stack; //list to contain the input file "command_lines"
+typedef std::list<std::string> uiuc_stack; //list to contain the input file "command_lines"
 
 class ParseFile
 {
         private:
                 
-                ::stack commands;
+                uiuc_stack commands;
                 std::ifstream file;
                 void readFile();
 
@@ -32,5 +32,5 @@ class ParseFile
                 void removeComments(std::string& inputLine);
                 std::string getToken(std::string inputLine, int tokenNo);
                 void storeCommands(std::string inputLine);
-                ::stack getCommands();
+                uiuc_stack getCommands();
 };

@@ -88,14 +88,14 @@ uiuc_1DdataFileReader( string file_name,
   int counter = 1, data = 0;
   string linetoken1; 
   string linetoken2; 
-  stack command_list;
+  uiuc_stack command_list;
   static string uiuc_1DdataFileReader_error = " (from uiuc_1DdataFileReader.cpp) ";
 
   /* Read the file and get the list of commands */
   matrix = new ParseFile(file_name);
   command_list = matrix -> getCommands();
 
-  for (LIST command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
+  for (auto command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
     {
       linetoken1 = matrix -> getToken(*command_line, 1); // gettoken(string,tokenNo);
       linetoken2 = matrix -> getToken(*command_line, 2); // 2 represents token No 2
@@ -134,13 +134,13 @@ uiuc_1DdataFileReader( string file_name,
   int counter = 1, data = 0;
   string linetoken1; 
   string linetoken2; 
-  stack command_list;
+  uiuc_stack command_list;
 
   /* Read the file and get the list of commands */
   matrix = new ParseFile(file_name);
   command_list = matrix -> getCommands();
 
-  for (LIST command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
+  for (auto command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
     {
       linetoken1 = matrix -> getToken(*command_line, 1); // gettoken(string,tokenNo);
       linetoken2 = matrix -> getToken(*command_line, 2); // 2 represents token No 2

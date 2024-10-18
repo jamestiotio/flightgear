@@ -95,7 +95,7 @@ void parse_controlSurface( const string& linetoken2, const string& linetoken3,
                            const string& linetoken8, const string& linetoken9,
                            const string& linetoken10, 
                            const string& aircraft_directory, 
-                           LIST command_line ) {
+                           uiuc_stack::iterator command_line ) {
     double token_value;
     int token_value_convert1, token_value_convert2;
     istringstream token3(linetoken3.c_str());

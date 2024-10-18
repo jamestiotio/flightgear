@@ -94,7 +94,7 @@ void parse_geometry( const string& linetoken2, const string& linetoken3,
                      const string& linetoken6, const string& linetoken7, 
                      const string& linetoken8, const string& linetoken9,
                      const string& linetoken10, 
-                     const string& aircraft_directory, LIST command_line ) {
+                     const string& aircraft_directory, uiuc_stack::iterator command_line ) {
     double token_value;
     istringstream token3(linetoken3.c_str());
     istringstream token4(linetoken4.c_str());

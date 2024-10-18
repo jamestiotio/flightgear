@@ -15,4 +15,4 @@ void parse_gear( const std::string& linetoken2, const std::string& linetoken3,
                  const std::string& linetoken6, const std::string& linetoken7, 
                  const std::string& linetoken8, const std::string& linetoken9,
                  const std::string& linetoken10, const std::string& aircraft_directory, 
-                 LIST command_line );
+                 uiuc_stack::iterator command_line );

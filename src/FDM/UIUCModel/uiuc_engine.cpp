@@ -74,7 +74,7 @@
 
 void uiuc_engine() 
 {
-  stack command_list;
+  uiuc_stack command_list;
   std::string linetoken1;
   std::string linetoken2;
 
@@ -107,7 +107,7 @@ void uiuc_engine()
   }
   */
  
-  for (LIST command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
+  for (auto command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
     {
       //cout << *command_line << endl;
       

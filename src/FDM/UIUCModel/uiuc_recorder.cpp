@@ -82,7 +82,7 @@ using std::endl;                // -dw
 
 void uiuc_recorder( double dt )
 {
-  ::stack command_list;
+  uiuc_stack command_list;
   std::string linetoken;
   // static int init = 0;
   static int recordStep = 0;
@@ -105,7 +105,7 @@ void uiuc_recorder( double dt )
       command_list = recordParts->getCommands();
       fout << endl;
 
-      LIST command_line;
+      uiuc_stack::iterator command_line;
       for (command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
         record_variables += recordParts->getToken(*command_line,2) + "  ";
 

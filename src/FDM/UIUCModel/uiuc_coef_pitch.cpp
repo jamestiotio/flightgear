@@ -91,13 +91,13 @@ void uiuc_coef_pitch()
 {
   std::string linetoken1;
   std::string linetoken2;
-  stack command_list;
+  uiuc_stack command_list;
 
   double q_nondim;
   
   command_list = aeroPitchParts -> getCommands();
   
-  for (LIST command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
+  for (auto command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
     {
       linetoken1 = aeroPitchParts -> getToken(*command_line, 1);
       linetoken2 = aeroPitchParts -> getToken(*command_line, 2);

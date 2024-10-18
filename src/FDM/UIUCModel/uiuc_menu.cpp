@@ -179,7 +179,7 @@ using std::exit;
 void uiuc_menu( string aircraft_name )
 {
   string aircraft_directory;
-  stack command_list;
+  uiuc_stack command_list;
   
   string linetoken1;
   string linetoken2;
@@ -231,7 +231,7 @@ void uiuc_menu( string aircraft_name )
   int index_aircraft_dat = aircraft_directory.find("aircraft.dat");
   aircraft_directory.erase(index_aircraft_dat,12);
 
-  for (LIST command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
+  for (auto command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
     {
       cout << *command_line << endl;
 

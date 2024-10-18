@@ -180,7 +180,8 @@ void ParseFile :: readFile()
         }
     }
 }
-stack ParseFile :: getCommands()
+
+uiuc_stack ParseFile :: getCommands()
 {
   return commands;
 }

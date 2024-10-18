@@ -94,13 +94,13 @@ void uiuc_2DdataFileReader( string file_name,
   string linetoken1;
   string linetoken2;
 
-  stack command_list;
+  uiuc_stack command_list;
 
   /* Read the file and get the list of commands */
   matrix = new ParseFile(file_name);
   command_list = matrix -> getCommands();
 
-  for (LIST command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
+  for (auto command_line = command_list.begin(); command_line!=command_list.end(); ++command_line)
     {
       linetoken1 = matrix -> getToken(*command_line, 1); // gettoken(string,tokenNo);
       linetoken2 = matrix -> getToken(*command_line, 2); // 2 represents token No 2
