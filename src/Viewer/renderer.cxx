@@ -34,19 +34,13 @@
 #include <typeinfo>
 
 #include <osg/ref_ptr>
-#include <osg/AlphaFunc>
 #include <osg/BlendFunc>
 #include <osg/Camera>
 #include <osg/CullFace>
 #include <osg/CullStack>
 #include <osg/Depth>
-#include <osg/Fog>
 #include <osg/Group>
 #include <osg/Hint>
-#include <osg/Light>
-#include <osg/LightModel>
-#include <osg/LightSource>
-#include <osg/Material>
 #include <osg/Math>
 #include <osg/NodeCallback>
 #include <osg/Notify>
@@ -54,7 +48,6 @@
 #include <osg/PolygonOffset>
 #include <osg/Program>
 #include <osg/Version>
-#include <osg/TexEnv>
 
 #include <osgUtil/LineSegmentIntersector>
 
@@ -198,50 +191,6 @@ private:
 
 #endif
 
-class FGLightSourceUpdateCallback : public osg::NodeCallback {
-public:
-
-  /**
-   * @param isSun true if the light is the actual sun i.e., for
-   * illuminating the moon.
-   */
-  FGLightSourceUpdateCallback(bool isSun = false) : _isSun(isSun) {}
-  FGLightSourceUpdateCallback(const FGLightSourceUpdateCallback& nc,
-                              const CopyOp& op)
-    : NodeCallback(nc, op), _isSun(nc._isSun)
-  {}
-  META_Object(flightgear,FGLightSourceUpdateCallback);
-
-  virtual void operator()(osg::Node* node, osg::NodeVisitor* nv)
-  {
-    assert(dynamic_cast<osg::LightSource*>(node));
-    osg::LightSource* lightSource = static_cast<osg::LightSource*>(node);
-    osg::Light* light = lightSource->getLight();
-
-    auto l = globals->get_subsystem<FGLight>();
-      if (!l) {
-          // lighting is down during re-init
-          return;
-      }
-
-    if (_isSun) {
-      light->setAmbient(Vec4(0.0f, 0.0f, 0.0f, 0.0f));
-      light->setDiffuse(Vec4(1.0f, 1.0f, 1.0f, 1.0f));
-      light->setSpecular(Vec4(0.0f, 0.0f, 0.0f, 0.0f));
-    } else {
-      light->setAmbient(toOsg(l->scene_ambient()));
-      light->setDiffuse(toOsg(l->scene_diffuse()));
-      light->setSpecular(toOsg(l->scene_specular()));
-    }
-    osg::Vec4f position(l->sun_vec()[0], l->sun_vec()[1], l->sun_vec()[2], 0);
-    light->setPosition(position);
-
-    traverse(node, nv);
-  }
-private:
-  const bool _isSun;
-};
-
 class FGWireFrameModeUpdateCallback : public osg::StateAttribute::Callback {
 public:
   FGWireFrameModeUpdateCallback() :
@@ -263,68 +212,6 @@ public:
   }
 private:
   SGPropertyNode_ptr mWireframe;
-};
-
-class FGLightModelUpdateCallback : public osg::StateAttribute::Callback {
-public:
-  FGLightModelUpdateCallback() :
-    mHighlights(fgGetNode("/sim/rendering/specular-highlight", true))
-  { }
-  virtual void operator()(osg::StateAttribute* stateAttribute,
-                          osg::NodeVisitor*)
-  {
-    assert(dynamic_cast<osg::LightModel*>(stateAttribute));
-    osg::LightModel* lightModel;
-    lightModel = static_cast<osg::LightModel*>(stateAttribute);
-
-#if 0
-    auto l = globals->get_subsystem<FGLight>();
-    lightModel->setAmbientIntensity(toOsg(l->scene_ambient());
-#else
-    lightModel->setAmbientIntensity(osg::Vec4(0, 0, 0, 1));
-#endif
-    lightModel->setTwoSided(true);
-    lightModel->setLocalViewer(false);
-
-    if (mHighlights->getBoolValue()) {
-      lightModel->setColorControl(osg::LightModel::SEPARATE_SPECULAR_COLOR);
-    } else {
-      lightModel->setColorControl(osg::LightModel::SINGLE_COLOR);
-    }
-  }
-private:
-  SGPropertyNode_ptr mHighlights;
-};
-
-class FGFogEnableUpdateCallback : public osg::StateSet::Callback {
-public:
-  FGFogEnableUpdateCallback() :
-    mFogEnabled(fgGetNode("/sim/rendering/fog", true))
-  { }
-  virtual void operator()(osg::StateSet* stateSet, osg::NodeVisitor*)
-  {
-    if (mFogEnabled->getStringValue() == "disabled") {
-      stateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
-    } else {
-      stateSet->setMode(GL_FOG, osg::StateAttribute::ON);
-    }
-  }
-private:
-  SGPropertyNode_ptr mFogEnabled;
-};
-
-class FGFogUpdateCallback : public osg::StateAttribute::Callback {
-public:
-  virtual void operator () (osg::StateAttribute* sa, osg::NodeVisitor* nv)
-  {
-    assert(dynamic_cast<SGUpdateVisitor*>(nv));
-    assert(dynamic_cast<osg::Fog*>(sa));
-    SGUpdateVisitor* updateVisitor = static_cast<SGUpdateVisitor*>(nv);
-    osg::Fog* fog = static_cast<osg::Fog*>(sa);
-    fog->setMode(osg::Fog::EXP2);
-    fog->setColor(toOsg(updateVisitor->getFogColor()));
-    fog->setDensity(updateVisitor->getFogExp2Density());
-  }
 };
 
 // update callback for the switch node guarding that splash
@@ -522,8 +409,6 @@ FGRenderer::init( void )
     _ypos          = fgGetNode("/sim/startup/ypos", true);
     _splash_alpha  = fgGetNode("/sim/startup/splash-alpha", true);
 
-    _horizon_effect       = fgGetNode("/sim/rendering/horizon-effect", true);
-
     _altitude_ft = fgGetNode("/position/altitude-ft", true);
 
     _cloud_status = fgGetNode("/environment/clouds/status", true);
@@ -577,27 +462,20 @@ FGRenderer::init( void )
 
 void FGRenderer::setupRoot()
 {
+    // Setup the default stateset for the entire scene
     osg::StateSet* stateSet = _root->getOrCreateStateSet();
 
-    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-
+    // No depth testing
     stateSet->setAttribute(new osg::Depth(osg::Depth::LESS));
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
 
+    // No blending
     stateSet->setAttribute(new osg::BlendFunc);
     stateSet->setMode(GL_BLEND, osg::StateAttribute::OFF);
 
-    stateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
-
-    // this will be set below
-    stateSet->setMode(GL_NORMALIZE, osg::StateAttribute::OFF);
-
-    osg::Material* material = new osg::Material;
-    stateSet->setAttribute(material);
-
-    stateSet->setTextureAttribute(0, new osg::TexEnv);
-    stateSet->setTextureMode(0, GL_TEXTURE_2D, osg::StateAttribute::OFF);
-
+    // Specify implementation-specific hints
+    // XXX: These changed with the years, e.g. perspective correction no longer
+    // exists. See the latest OpenGL reference.
     osg::Hint* hint = new osg::Hint(GL_FOG_HINT, GL_DONT_CARE);
     hint->setUpdateCallback(new FGHintUpdateCallback("/sim/rendering/fog"));
     stateSet->setAttribute(hint);
@@ -654,53 +532,18 @@ FGRenderer::setupView( void )
     osg::ref_ptr<simgear::SGReaderWriterOptions> opt;
     opt = simgear::SGReaderWriterOptions::fromPath(globals->get_fg_root());
     opt->setPropertyNode(globals->get_props());
-    _sky->build( 80000.0, 80000.0,
-                  232.5, 180.8,
-                  *ephemerisSub->data(),
-                  fgGetNode("/environment", true),
-                  opt.get());
+    _sky->build(80000.0, 80000.0,
+                232.5, 180.8,
+                *ephemerisSub->data(),
+                fgGetNode("/environment", true),
+                opt.get());
+    // Do not automatically compute near far values
+    view->getCamera()->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
 
-    view->getCamera()
-        ->setComputeNearFarMode(osg::CullSettings::DO_NOT_COMPUTE_NEAR_FAR);
+    // Add the sky to the root
+    _root->addChild(_sky->getPreRoot());
 
-
-    // need to update the light on every frame
-    // OSG LightSource objects are rather confusing. OSG only supports
-    // the 10 lights specified by OpenGL itself; if more than one
-    // LightSource in the scene graph have the same light number, it's
-    // indeterminate which values will be used to render geometry that
-    // has that light number enabled. Also, adding children to a
-    // LightSource is just a shortcut for setting up a state set that
-    // has the corresponding OpenGL light enabled: a LightSource will
-    // affect geometry anywhere in the scene graph that has its light
-    // number enabled in a state set.
-    osg::ref_ptr<LightSource> lightSource = new LightSource;
-    lightSource->setName("FGLightSource");
-    lightSource->getLight()->setDataVariance(Object::DYNAMIC);
-    // relative because of CameraView being just a clever transform node
-    lightSource->setReferenceFrame(osg::LightSource::RELATIVE_RF);
-    lightSource->setLocalStateSetModes(osg::StateAttribute::ON);
-    lightSource->setUpdateCallback(new FGLightSourceUpdateCallback);
-    _viewerSceneRoot->addChild(lightSource);
-
-    // we need a white diffuse light for the phase of the moon
-    osg::ref_ptr<LightSource> sunLight = new osg::LightSource;
-    sunLight->setName("sunLightSource");
-    sunLight->getLight()->setDataVariance(Object::DYNAMIC);
-    sunLight->getLight()->setLightNum(1);
-    sunLight->setUpdateCallback(new FGLightSourceUpdateCallback(true));
-    sunLight->setReferenceFrame(osg::LightSource::RELATIVE_RF);
-    sunLight->setLocalStateSetModes(osg::StateAttribute::ON);
-
-    // Hang a StateSet above the sky subgraph in order to turn off
-    // light 0
-    Group* skyGroup = _sky->getPreRoot();
-    StateSet* skySS = skyGroup->getOrCreateStateSet();
-    skySS->setMode(GL_LIGHT0, StateAttribute::OFF);
-    sunLight->addChild(skyGroup);
-
-	_root->addChild(sunLight);
-
+    // Add the main scenery (including models and aircraft) to the root
     osg::Group* sceneGroup = globals->get_scenery()->get_scene_graph();
     sceneGroup->setName("rendererScene");
     sceneGroup->setNodeMask(~simgear::BACKGROUND_BIT);
@@ -708,25 +551,13 @@ FGRenderer::setupView( void )
 
     // setup state-set for main scenery (including models and aircraft)
     osg::StateSet* stateSet = sceneGroup->getOrCreateStateSet();
-    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::ON);
+    // enable depth testing by default
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::ON);
-
-    // enable disable specular highlights.
-    // is the place where we might plug in an other fragment shader ...
-    osg::LightModel* lightModel = new osg::LightModel;
-    lightModel->setUpdateCallback(new FGLightModelUpdateCallback);
-    stateSet->setAttribute(lightModel);
 
     // switch to enable wireframe
     osg::PolygonMode* polygonMode = new osg::PolygonMode;
     polygonMode->setUpdateCallback(new FGWireFrameModeUpdateCallback);
     stateSet->setAttributeAndModes(polygonMode);
-
-    // scene fog handling
-    osg::Fog* fog = new osg::Fog;
-    fog->setUpdateCallback(new FGFogUpdateCallback);
-    stateSet->setAttributeAndModes(fog);
-    stateSet->setUpdateCallback(new FGFogEnableUpdateCallback);
 
     osg::Camera* guiCamera = getGUICamera(CameraGroup::getDefault());
     if (guiCamera) {
@@ -840,47 +671,23 @@ FGRenderer::update( ) {
     // Force update of center dependent values ...
     current__view->set_dirty();
 
-    assert(composite_viewer_enabled != -1);
-    std::vector<osg::Camera*> cameras;
-    if (composite_viewer) {
-        assert(!viewer);
-        unsigned n = composite_viewer->getNumViews();
-        for (unsigned i=0; i<n; ++i) {
-            osgViewer::View* view = composite_viewer->getView(i);
-            osg::Camera* camera = view->getCamera();
-            cameras.push_back(camera);
-        }
-    }
-    else {
-        cameras.push_back(viewer->getCamera());
-    }
-    for (osg::Camera* camera: cameras) {
-        osg::Vec4 clear_color = _altitude_ft->getDoubleValue() < 250000
-                              ? toOsg(l->adj_fog_color())
-                              // skydome ends at ~262000ft (default rendering)
-                              // ~328000 ft (ALS) and would produce a strange
-                              // looking greyish space -> black looks much
-                              // better :-)
-                              : osg::Vec4(0, 0, 0, 1);
-        camera->setClearColor(clear_color);
+    // Update the sky
+    updateSky();
 
-        updateSky();
+    // need to call the update visitor once
+    getFrameStamp()->setCalendarTime(*globals->get_time_params()->getGmt());
+    _updateVisitor->setViewData(current__view->getViewPosition(),
+                                current__view->getViewOrientation());
+    //_updateVisitor->setViewData(eye2, center3);
+    SGVec3f sundirection(l->sun_vec()[0], l->sun_vec()[1], l->sun_vec()[2]);
+    SGVec3f moondirection(l->moon_vec()[0], l->moon_vec()[1], l->moon_vec()[2]);
 
-        // need to call the update visitor once
-        getFrameStamp()->setCalendarTime(*globals->get_time_params()->getGmt());
-        _updateVisitor->setViewData(current__view->getViewPosition(),
-                                    current__view->getViewOrientation());
-        //_updateVisitor->setViewData(eye2, center3);
-        SGVec3f sundirection(l->sun_vec()[0], l->sun_vec()[1], l->sun_vec()[2]);
-	SGVec3f moondirection(l->moon_vec()[0], l->moon_vec()[1], l->moon_vec()[2]);
-	
-	_updateVisitor->setLight(sundirection,moondirection, l->scene_ambient(),
-                                 l->scene_diffuse(), l->scene_specular(),
-                                 l->adj_fog_color(),
-                                 l->get_sun_angle()*SGD_RADIANS_TO_DEGREES);
-        _updateVisitor->setVisibility(actual_visibility);
-        simgear::GroundLightManager::instance()->update(_updateVisitor.get());
-    }
+    _updateVisitor->setLight(sundirection,moondirection, l->scene_ambient(),
+                             l->scene_diffuse(), l->scene_specular(),
+                             l->adj_fog_color(),
+                             l->get_sun_angle()*SGD_RADIANS_TO_DEGREES);
+    _updateVisitor->setVisibility(actual_visibility);
+    simgear::GroundLightManager::instance()->update(_updateVisitor.get());
 
     osg::Node::NodeMask cullMask = ~simgear::LIGHTS_BITS & ~simgear::PICK_BIT;
     cullMask |= simgear::GroundLightManager::instance()
