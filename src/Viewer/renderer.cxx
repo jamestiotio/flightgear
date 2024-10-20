@@ -91,7 +91,6 @@
 #include <Model/modelmgr.hxx>
 #include <Model/acmodel.hxx>
 #include <Scenery/scenery.hxx>
-#include <Scenery/redout.hxx>
 #include <GUI/new_gui.hxx>
 #include <GUI/gui.h>
 #include <GUI/Highlight.hxx>
@@ -770,8 +769,7 @@ FGRenderer::setupView( void )
     // The clouds are attached directly to the scene graph root
     // because, in theory, they don't want the same default state set
     // as the rest of the scene. This may not be true in practice.
-	_viewerSceneRoot->addChild(_sky->getCloudRoot());
-	_viewerSceneRoot->addChild(FGCreateRedoutNode());
+    _viewerSceneRoot->addChild(_sky->getCloudRoot());
 
     // Attach empty program to the scene root so that shader programs
     // don't leak into state sets (effects) that shouldn't have one.
