@@ -28,7 +28,10 @@
 #include <simgear/debug/logstream.hxx>
 
 #include "WakeMesh.hxx"
-#include "FDM/ls_matrix.h"
+
+extern "C" {
+    #include "FDM/ls_matrix.h"
+}
 
 WakeMesh::WakeMesh(double _span, double _chord, const std::string& aircraft_name)
     : nelm(10), span(_span), chord(_chord)
