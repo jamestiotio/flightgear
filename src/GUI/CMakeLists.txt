@@ -269,7 +269,10 @@ flightgear_component(GUI "${SOURCES}" "${HEADERS}")
 if (APPLE)
     # PCH doesn't work for Objective-C++
     set_property(SOURCE 
-          FGCocoaMenuBar.mm CocoaFileDialog.mm CocoaMouseCursor.mm CocoaHelpers.mm
+          ${CMAKE_CURRENT_SOURCE_DIR}/FGCocoaMenuBar.mm 
+          ${CMAKE_CURRENT_SOURCE_DIR}/CocoaFileDialog.mm 
+          ${CMAKE_CURRENT_SOURCE_DIR}/CocoaMouseCursor.mm 
+          ${CMAKE_CURRENT_SOURCE_DIR}/CocoaHelpers.mm
         TARGET_DIRECTORY fgfsObjects
         PROPERTY 
           SKIP_PRECOMPILE_HEADERS ON)
