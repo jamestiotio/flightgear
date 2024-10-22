@@ -10,7 +10,7 @@ if(WIN32)
 	# define an imported target for DBus manually
 	if (DBUS_INCLUDE_DIRS AND DBUS_LIBRARIES)
 		add_library(DBus::DBus UNKNOWN IMPORTED)
-		set_target_properties(DBus PROPERTIES
+		set_target_properties(DBus::DBus PROPERTIES
 			INTERFACE_INCLUDE_DIRECTORIES "${DBUS_INCLUDE_DIRS}"
 			IMPORTED_LOCATION "${DBUS_LIBRARIES}"
 		)
