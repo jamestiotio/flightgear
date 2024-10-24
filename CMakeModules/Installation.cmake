@@ -83,7 +83,7 @@ string(TIMESTAMP iss_config_timestamp)
 
 ########################################################################################
 
-#if (MSVC)
+if (MSVC)
     # iscc.exe only accepts Windows style-paths, so explicitly convert
     file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}" FG_WINDOWS_INSTALL_PREFIX)
     file(TO_NATIVE_PATH "${OSG_BASE_DIR}" INNO_SETUP_OSG_BASE_DIR)
@@ -93,7 +93,7 @@ string(TIMESTAMP iss_config_timestamp)
     install(FILES ${CMAKE_BINARY_DIR}/InstallConfig.iss 
         DESTINATION . 
         COMPONENT packaging EXCLUDE_FROM_ALL)
-#endif()
+endif()
 
 # OSG libs
 foreach (osglib OSG OpenThreads osgUtil osgText osgGA osgSim osgParticle osgTerrain osgViewer osgDB)
@@ -142,6 +142,17 @@ if (LINUX)
         COMPONENT packaging EXCLUDE_FROM_ALL)
 
     # TODO: things under share/
+endif()
+
+
+########################################################################################
+# actual app installation: this needs to happen late, after the various TARGET_BUNDLE_CONTENT_DIR
+# rules are applied
+
+if (APPLE)
+    install(TARGETS fgfs BUNDLE DESTINATION .)
+else()
+    install(TARGETS fgfs RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 endif()
 
 

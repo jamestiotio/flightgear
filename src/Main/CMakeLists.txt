@@ -102,12 +102,8 @@ export_debug_symbols(fgfs)
 # Additional search paths for includes.
 setup_fgfs_includes(fgfs)
 
-# this has to live here for compatability with older CMake versions
-if (APPLE)
-    install(TARGETS fgfs BUNDLE DESTINATION .)
-else()
-    install(TARGETS fgfs RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
-endif()
+# installation of fgfs is handled in Installation.cmake
+# order is very important for correct macOS bundle assembly
 
 add_executable(nasal
     nasal-bin.cxx
