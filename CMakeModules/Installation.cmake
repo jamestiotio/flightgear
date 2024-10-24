@@ -122,7 +122,6 @@ if (APPLE)
     # FIXME: this copies the fully version file name, need to rename to the non-versioned one
     install(FILES 
             $<TARGET_FILE:OpenAL::OpenAL>  
-            $<TARGET_FILE:LibLZMA::LibLZMA> 
         DESTINATION 
             $<TARGET_BUNDLE_CONTENT_DIR:fgfs>/Frameworks
     )
