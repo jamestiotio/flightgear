@@ -17,11 +17,17 @@ if(WIN32)
 
 		set(HAVE_DBUS 1)
 	endif()
+elseif(APPLE)
+	find_package(DBus1 CONFIG)
+	if (TARGET dbus-1)
+		add_library(DBus::DBus ALIAS dbus-1)
+		set(HAVE_DBUS 1)
+	endif()
 else()
 	find_package(PkgConfig QUIET)
 
 	if(PKG_CONFIG_FOUND)
-		pkg_check_modules(DBUS IMPORTED_TARGET dbus-1)
+		pkg_check_modules(DBUS IMPORTED_TARGET GLOBAL dbus-1)
 	endif (PKG_CONFIG_FOUND)
 
 	if(DBUS_FOUND)
