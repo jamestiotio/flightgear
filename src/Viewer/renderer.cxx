@@ -413,22 +413,17 @@ void FGRenderer::setupRoot()
     stateSet->setMode(GL_BLEND, osg::StateAttribute::OFF);
 
     // Specify implementation-specific hints
-    // XXX: These changed with the years, e.g. perspective correction no longer
-    // exists. See the latest OpenGL reference.
-    osg::Hint* hint = new osg::Hint(GL_FOG_HINT, GL_DONT_CARE);
-    hint->setUpdateCallback(new FGHintUpdateCallback("/sim/rendering/fog"));
-    stateSet->setAttribute(hint);
-    hint = new osg::Hint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
-    hint->setUpdateCallback(new FGHintUpdateCallback("/sim/rendering/polygon-smooth"));
+    osg::Hint* hint = new osg::Hint(GL_FRAGMENT_SHADER_DERIVATIVE_HINT, GL_DONT_CARE);
+    hint->setUpdateCallback(new FGHintUpdateCallback("/sim/rendering/hints/fragment-shader-derivative"));
     stateSet->setAttribute(hint);
     hint = new osg::Hint(GL_LINE_SMOOTH_HINT, GL_DONT_CARE);
-    hint->setUpdateCallback(new FGHintUpdateCallback("/sim/rendering/line-smooth"));
+    hint->setUpdateCallback(new FGHintUpdateCallback("/sim/rendering/hints/line-smooth"));
     stateSet->setAttribute(hint);
-    hint = new osg::Hint(GL_POINT_SMOOTH_HINT, GL_DONT_CARE);
-    hint->setUpdateCallback(new FGHintUpdateCallback("/sim/rendering/point-smooth"));
+    hint = new osg::Hint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
+    hint->setUpdateCallback(new FGHintUpdateCallback("/sim/rendering/hints/polygon-smooth"));
     stateSet->setAttribute(hint);
-    hint = new osg::Hint(GL_PERSPECTIVE_CORRECTION_HINT, GL_DONT_CARE);
-    hint->setUpdateCallback(new FGHintUpdateCallback("/sim/rendering/perspective-correction"));
+    hint = new osg::Hint(GL_TEXTURE_COMPRESSION_HINT, GL_DONT_CARE);
+    hint->setUpdateCallback(new FGHintUpdateCallback("/sim/rendering/hints/texture-compression"));
     stateSet->setAttribute(hint);
 }
 
