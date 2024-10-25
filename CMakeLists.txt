@@ -212,7 +212,6 @@ option(ENABLE_HID_INPUT  "Set to ON to build HID-based input code" ${EVENT_INPUT
 option(ENABLE_PLIB_JOYSTICK  "Set to ON to enable legacy joystick code (default)" ON)
 option(ENABLE_SWIFT      "Set to ON to build the swift module" ON)
 option(ENABLE_SENTRY     "Set to ON to build the Sentry.io crash reporting" ON)
-option(ENABLE_HUD        "Set to ON to build the default head-up display" ON)
 option(ENABLE_PUI        "Set to ON to build the legacy PUI user-interface" ON)
 
 # Test-suite options.

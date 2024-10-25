@@ -41,9 +41,6 @@
 #include <Environment/environment_mgr.hxx>
 #include <Environment/ephemeris.hxx>
 #include <Instrumentation/instrument_mgr.hxx>
-#ifdef ENABLE_HUD
-#  include <Instrumentation/HUD/HUD.hxx>
-#endif
 #include <Systems/system_mgr.hxx>
 #include <Autopilot/route_mgr.hxx>
 #include <Autopilot/autopilotgroup.hxx>
@@ -89,9 +86,6 @@ SGSubsystem* createSubsystemByName(const std::string& name)
     MAKE_SUB(Ephemeris, "ephemeris");
     MAKE_SUB(FGSystemMgr, "systems");
     MAKE_SUB(FGInstrumentMgr, "instrumentation");
-#ifdef ENABLE_HUD
-    MAKE_SUB(HUD, "hud");
-#endif
     MAKE_SUB(FGRouteMgr, "route-manager");
     MAKE_SUB(FGIO, "io");
     MAKE_SUB(FGLogger, "logger");

@@ -85,9 +85,6 @@
 #include <GUI/gui.h>
 #include <GUI/Highlight.hxx>
 
-#ifdef ENABLE_HUD
-#  include <Instrumentation/HUD/HUD.hxx>
-#endif
 #include <Environment/precipitation_mgr.hxx>
 #include <Environment/environment_mgr.hxx>
 #include <Environment/ephemeris.hxx>
@@ -136,57 +133,6 @@ public:
 private:
   SGPropertyNode_ptr mConfigNode;
 };
-
-#ifdef ENABLE_HUD
-
-class SGHUDDrawable : public osg::Drawable {
-public:
-  SGHUDDrawable()
-  {
-    // Dynamic stuff, do not store geometry
-    setUseDisplayList(false);
-    setDataVariance(Object::DYNAMIC);
-
-    osg::StateSet* stateSet = getOrCreateStateSet();
-    stateSet->setRenderBinDetails(1000, "RenderBin");
-
-    // speed optimization?
-    stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
-    stateSet->setAttribute(new osg::BlendFunc(osg::BlendFunc::SRC_ALPHA, osg::BlendFunc::ONE_MINUS_SRC_ALPHA));
-    stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
-    stateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
-    stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
-
-    stateSet->setTextureAttribute(0, new osg::TexEnv(osg::TexEnv::MODULATE));
-  }
-  virtual void drawImplementation(osg::RenderInfo& renderInfo) const
-  { drawImplementation(*renderInfo.getState()); }
-  void drawImplementation(osg::State& state) const
-  {
-    state.setActiveTextureUnit(0);
-    state.setClientActiveTextureUnit(0);
-    state.disableAllVertexArrays();
-
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
-    glPushClientAttrib(~0u);
-
-      // HUD can be NULL
-      auto hud = globals->get_subsystem<HUD>();
-      if (hud) {
-          hud->draw(state);
-      }
-
-    glPopClientAttrib();
-    glPopAttrib();
-  }
-
-  virtual osg::Object* cloneType() const { return new SGHUDDrawable; }
-  virtual osg::Object* clone(const osg::CopyOp&) const { return new SGHUDDrawable; }
-
-private:
-};
-
-#endif
 
 class FGWireFrameModeUpdateCallback : public osg::StateAttribute::Callback {
 public:
@@ -558,12 +504,6 @@ FGRenderer::setupView( void )
 
     osg::Camera* guiCamera = getGUICamera(CameraGroup::getDefault());
     if (guiCamera) {
-#ifdef ENABLE_HUD
-        osg::Geode* hudGeode = new osg::Geode;
-        hudGeode->addDrawable(new SGHUDDrawable);
-        guiCamera->addChild(hudGeode);
-#endif
-
 #if defined(HAVE_PUI)
         _puiCamera = new flightgear::PUICamera;
         _puiCamera->init(guiCamera, view);

@@ -104,24 +104,5 @@ set(HEADERS
     KLN89/kln89_page_alt.hxx
 )
 
-if (ENABLE_HUD)
-    list(APPEND SOURCES
-        HUD/HUD.cxx
-        HUD/HUD_dial.cxx
-        HUD/HUD_gauge.cxx
-        HUD/HUD_instrument.cxx
-        HUD/HUD_label.cxx
-        HUD/HUD_ladder.cxx
-        HUD/HUD_misc.cxx
-        HUD/HUD_runway.cxx
-        HUD/HUD_scale.cxx
-        HUD/HUD_tape.cxx
-        HUD/HUD_tbi.cxx
-    )
-    list(APPEND HEADERS
-        HUD/HUD.hxx
-        HUD/HUD_private.hxx
-    )
-endif()
 
 flightgear_component(Instruments "${SOURCES}" "${HEADERS}")

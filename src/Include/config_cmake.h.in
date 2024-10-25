@@ -76,5 +76,3 @@
 #define SENTRY_API_KEY "@sentry_api_key@"
 
 #cmakedefine ENABLE_OSGXR
-
-#cmakedefine ENABLE_HUD
