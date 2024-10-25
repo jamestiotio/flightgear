@@ -276,7 +276,6 @@ void SplashScreen::createNodes()
     osg::StateSet* stateSet = _splashQuadCamera->getOrCreateStateSet();
     stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
     stateSet->setAttribute(new osg::BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), osg::StateAttribute::ON);
-    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
     stateSet->setRenderBinDetails(1000, "RenderBin");
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
 
@@ -400,11 +399,8 @@ osg::ref_ptr<osg::Camera> SplashScreen::createFBOCamera()
 #endif
 
     osg::StateSet* stateSet = c->getOrCreateStateSet();
-    stateSet->setMode(GL_ALPHA_TEST, osg::StateAttribute::OFF);
     stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
     stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
-    stateSet->setAttribute(new osg::Depth(osg::Depth::ALWAYS, 0, 1, false));
-    stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
 
     bool use_vertex_attribute_aliasing = false;
     osg::Camera* guiCamera = flightgear::getGUICamera(flightgear::CameraGroup::getDefault());
