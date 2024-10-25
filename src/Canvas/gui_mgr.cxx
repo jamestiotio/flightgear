@@ -223,15 +223,14 @@ DesktopGroup::DesktopGroup(osg::Camera* camera):
   stateSet->setRenderBinDetails(1000, "RenderBin");
 
   // speed optimization?
+  stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
   stateSet->setMode(GL_CULL_FACE, osg::StateAttribute::OFF);
+
+  stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
   stateSet->setAttribute(new osg::BlendFunc(
     osg::BlendFunc::SRC_ALPHA,
     osg::BlendFunc::ONE_MINUS_SRC_ALPHA)
   );
-  stateSet->setMode(GL_BLEND, osg::StateAttribute::ON);
-  stateSet->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
-  stateSet->setMode(GL_FOG, osg::StateAttribute::OFF);
-  stateSet->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
 
   _width = _height = -1;
 }
