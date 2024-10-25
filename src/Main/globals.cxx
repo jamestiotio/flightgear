@@ -56,7 +56,6 @@
 #include <Scenery/scenery.hxx>
 #include <Scenery/tilemgr.hxx>
 #include <Viewer/renderer.hxx>
-#include <GUI/FGFontCache.hxx>
 #include <GUI/MessageBox.hxx>
 
 #include <simgear/sound/soundmgr.hxx>
@@ -231,7 +230,6 @@ FGGlobals::~FGGlobals()
     // renderer touches subsystems during its destruction
     set_renderer(nullptr);
 
-    FGFontCache::shutdown();
     fgCancelSnapShot();
 
     delete subsystem_mgr;

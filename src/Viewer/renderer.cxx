@@ -102,10 +102,6 @@
 #include <GUI/QQuickDrawable.hxx>
 #endif
 
-#if defined(HAVE_PUI)
-#include <Viewer/PUICamera.hxx>
-#endif
-
 using namespace osg;
 using namespace flightgear;
 
@@ -504,11 +500,6 @@ FGRenderer::setupView( void )
 
     osg::Camera* guiCamera = getGUICamera(CameraGroup::getDefault());
     if (guiCamera) {
-#if defined(HAVE_PUI)
-        _puiCamera = new flightgear::PUICamera;
-        _puiCamera->init(guiCamera, view);
-#endif
-
 #if defined(ENABLE_QQ_UI)
         osgViewer::Viewer* viewer = dynamic_cast<osgViewer::Viewer*>(view);
         if (viewer) {

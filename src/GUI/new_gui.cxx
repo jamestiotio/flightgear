@@ -1,6 +1,6 @@
-// new_gui.cxx: implementation of XML-configurable GUI support.
-
 /*
+ * SPDX-FileName: new_gui.cxx
+ * SPDX-FileComment: implementation of XML-configurable GUI support.
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
@@ -8,8 +8,6 @@
 
 #include "new_gui.hxx"
 
-#include <algorithm>
-#include <iostream>
 #include <cstring>
 #include <sys/types.h>
 
@@ -24,11 +22,6 @@
 #include <Main/sentryIntegration.hxx>
 #include <Scripting/NasalSys.hxx>
 
-#if defined(SG_UNIX) && !defined(SG_MAC) 
-#include "GL/glx.h"
-#endif
-
-
 #if defined(SG_MAC)
 #include "FGCocoaMenuBar.hxx"
 #endif
@@ -37,26 +30,10 @@
 #include "FGWindowsMenuBar.hxx"
 #endif
 
-#if defined(HAVE_PUI)
-    // ensure we include this before puAux.h, so that 
-    // #define _PU_H_ 1 has been done, and hence we don't
-    // include the un-modified system pu.h
-    #include "FlightGear_pu.h"
-
-    #include <plib/puAux.h>
-#endif
-
-
 #include "FGNasalMenuBar.hxx"
 #include "FGPUICompatDialog.hxx"
 #include "PUICompatObject.hxx"
 
-#if defined(HAVE_PUI)
-#include "FGPUIDialog.hxx"
-#include "FGPUIMenuBar.hxx"
-#endif
-
-#include "FGFontCache.hxx"
 #include "FGColor.hxx"
 
 #include "Highlight.hxx"
@@ -64,12 +41,7 @@
 // ignore the word Navaid here, it's a DataCache
 #include <Navaids/NavDataCache.hxx>
 
-using std::map;
 using std::string;
-
-#if defined(HAVE_PUI)
-extern void puCleanUpJunk(void);
-#endif
 
 ////////////////////////////////////////////////////////////////////////
 // Implementation of NewGUI.
@@ -130,8 +102,6 @@ static void scanMenus()
 void
 NewGUI::init ()
 {
-    _usePUI = fgGetBool("/sim/gui/use-pui", true);
-
     createMenuBarImplementation();
     fgTie("/sim/menubar/visibility", this,
           &NewGUI::getMenuBarVisible, &NewGUI::setMenuBarVisible);
@@ -176,10 +146,6 @@ NewGUI::shutdown()
     fgUntie("/sim/menubar/overlap-hide");
     _menubar.reset();
     _dialog_props.clear();
-
-#if defined(HAVE_PUI)
-    puCleanUpJunk();
-#endif
 }
 
 void
@@ -204,18 +170,12 @@ NewGUI::createMenuBarImplementation()
     }
 #endif
 #if defined(SG_WINDOWS)
-	if (fgGetBool("/sim/menubar/native", true)) {
-	// Windows-native menubar disabled for the moment, fall-through
-	// to PUI version
-   //     _menubar.reset(new FGWindowsMenuBar);
+    if (fgGetBool("/sim/menubar/native", true)) {
+        // Windows-native menubar disabled for the moment, fall-through
+        // to our default one.
+        // _menubar.reset(new FGWindowsMenuBar);
     }
 #endif
-#if defined(HAVE_PUI)
-    if (!_menubar.get() && _usePUI) {
-        _menubar.reset(new FGPUIMenuBar);
-    }
-#endif
-
     if (!_menubar.get()) {
         _menubar.reset(new FGNasalMenuBar);
     }
@@ -308,17 +268,11 @@ NewGUI::showDialog (const string &name)
 
     flightgear::addSentryBreadcrumb("showing GUI dialog:" + name, "info");
     try {
-        if (_usePUI) {
-#if defined(HAVE_PUI)
-            _active_dialogs[name] = new FGPUIDialog(getDialogProperties(name));
-#endif
+        SGSharedPtr<FGPUICompatDialog> pcd = new FGPUICompatDialog(getDialogProperties(name));
+        if (pcd->init()) {
+            _active_dialogs[name] = pcd; // establish ownership
         } else {
-            SGSharedPtr<FGPUICompatDialog> pcd = new FGPUICompatDialog(getDialogProperties(name));
-            if (pcd->init()) {
-                _active_dialogs[name] = pcd; // establish ownership
-            } else {
-                return false;
-            }
+            return false;
         }
 
         fgSetString("/sim/gui/dialogs/current-dialog", name);
@@ -568,6 +522,7 @@ NewGUI::readDir (const SGPath& path)
   
     txn.commit();
 }
+
 ////////////////////////////////////////////////////////////////////////
 // Style handling.
 ////////////////////////////////////////////////////////////////////////
@@ -624,29 +579,13 @@ NewGUI::setStyle (void)
     //if (selected_style && n)
     //    n->alias(selected_style);
 
-    setupFont(n->getNode("fonts/gui", true));
+    //setupFont(n->getNode("fonts/gui", true));
     n = n->getNode("colors", true);
 
     for (int i = 0; i < n->nChildren(); i++) {
         SGPropertyNode *child = n->getChild(i);
         _colors[child->getNameString()] = new FGColor(child);
     }
-
-    FGColor *c = _colors["background"];
-#if defined(HAVE_PUI)
-    puSetDefaultColourScheme(c->red(), c->green(), c->blue(), c->alpha());
-#endif
-}
-
-
-void
-NewGUI::setupFont (SGPropertyNode *node)
-{
-#if defined(HAVE_PUI)
-    _font = FGFontCache::instance()->get(node);
-    puSetDefaultFonts(*_font, *_font);
-#endif
-    return;
 }
 
 

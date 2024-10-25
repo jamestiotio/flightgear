@@ -760,7 +760,6 @@ int fgMainInit( int argc, char **argv )
     fgOSOpenWindow(true /* request stencil buffer */);
     fgOSResetProperties();
 
-    fntInit();
     globals->get_renderer()->preinit();
 
     if (fgGetBool("/sim/ati-viewport-hack", true)) {

@@ -212,7 +212,6 @@ option(ENABLE_HID_INPUT  "Set to ON to build HID-based input code" ${EVENT_INPUT
 option(ENABLE_PLIB_JOYSTICK  "Set to ON to enable legacy joystick code (default)" ON)
 option(ENABLE_SWIFT      "Set to ON to build the swift module" ON)
 option(ENABLE_SENTRY     "Set to ON to build the Sentry.io crash reporting" ON)
-option(ENABLE_PUI        "Set to ON to build the legacy PUI user-interface" ON)
 
 # Test-suite options.
 option(ENABLE_AUTOTESTING "Set to ON to execute the test suite after building the test_suite target (default)" ON)
@@ -375,14 +374,6 @@ else()
     set(HAVE_QT 0)
     set(ENABLE_FGQCANVAS OFF)
 endif (ENABLE_QT)
-
-##############################################################################
-
-if (ENABLE_PUI)
-    message(STATUS "PLIB PUI user-interface enabled, checking for it")
-    find_package(PLIB REQUIRED puaux pu)
-    set(HAVE_PUI 1)
-endif()
 
 ##############################################################################
 

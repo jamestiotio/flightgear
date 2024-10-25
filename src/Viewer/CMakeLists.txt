@@ -37,9 +37,4 @@ if (ENABLE_OSGXR)
 		)
 endif()
 
-if (YES)
-    list(APPEND HEADERS PUICamera.hxx)
-    list(APPEND SOURCES PUICamera.cxx)
-endif()
-
 flightgear_component(Viewer "${SOURCES}" "${HEADERS}")

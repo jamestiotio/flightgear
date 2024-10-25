@@ -35,7 +35,6 @@ namespace flightgear
 {
 class FGEventHandler;
 class CameraGroup;
-class PUICamera;
 }
 
 class SGSky;
@@ -136,7 +135,6 @@ protected:
 
     osg::ref_ptr<SplashScreen> _splash;
     QQuickDrawable* _quickDrawable = nullptr;
-    flightgear::PUICamera* _puiCamera = nullptr;
 };
 
 bool fgDumpSceneGraphToFile(const char* filename);

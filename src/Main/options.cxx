@@ -3344,7 +3344,6 @@ void Options::showVersion() const
     cout << SGPath::join(scn, SGPath::pathListSep) << endl;
     cout << "SimGear version: " << SG_STRINGIZE(SIMGEAR_VERSION) << endl;
     cout << "OSG version: " << osgGetVersion() << endl;
-    cout << "PLIB version: " << PLIB_VERSION << endl;
 }
 
 // Print a report using JSON syntax on the standard output, encoded in UTF-8.

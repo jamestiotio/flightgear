@@ -66,8 +66,6 @@
 
 #define FG_BUILD_TYPE "@FG_BUILD_TYPE@"
 
-#cmakedefine HAVE_PUI
-
 #cmakedefine HAVE_QRC_TRANSLATIONS
 
 #cmakedefine ENABLE_SWIFT
