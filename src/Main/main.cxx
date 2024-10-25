@@ -40,7 +40,6 @@
 #include <GUI/MessageBox.hxx>
 #include <GUI/gui.h>
 #include <Main/locale.hxx>
-#include <Model/panelnode.hxx>
 #include <Navaids/NavDataCache.hxx>
 #include <Scenery/scenery.hxx>
 #include <Sound/soundmanager.hxx>
@@ -349,7 +348,6 @@ static void fgIdleFunction ( void ) {
         // Initialize the material manager
         ////////////////////////////////////////////////////////////////////
         globals->set_matlib( new SGMaterialLib );
-        simgear::SGModelLib::setPanelFunc(FGPanelNode::load);
 
     } else if (( idle_state == 5 ) || (idle_state == 2005)) {
         idle_state+=2;

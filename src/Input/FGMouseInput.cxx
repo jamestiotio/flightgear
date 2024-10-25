@@ -37,11 +37,10 @@
 #include <simgear/scene/model/SGPickAnimation.hxx>
 
 #include "FGButton.hxx"
-#include "Main/globals.hxx"
+#include <Main/globals.hxx>
+#include <Main/fg_props.hxx>
 #include <Viewer/renderer.hxx>
 #include <Viewer/sview.hxx>
-#include <Model/panelnode.hxx>
-#include <Cockpit/panel.hxx>
 #include <Viewer/FGEventHandler.hxx>
 #include <GUI/MouseCursor.hxx>
 

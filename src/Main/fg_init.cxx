@@ -34,6 +34,7 @@
 #include <simgear/canvas/Canvas.hxx>
 #include <simgear/constants.h>
 #include <simgear/debug/logstream.hxx>
+#include <simgear/structure/commands.hxx>
 #include <simgear/structure/exception.hxx>
 #include <simgear/structure/event_mgr.hxx>
 #include <simgear/structure/SGPerfMon.hxx>
@@ -75,9 +76,6 @@
 
 #include <Autopilot/route_mgr.hxx>
 #include <Autopilot/autopilotgroup.hxx>
-
-#include <Cockpit/panel.hxx>
-#include <Cockpit/panel_io.hxx>
  
 #include <Canvas/canvas_mgr.hxx>
 #include <Canvas/gui_mgr.hxx>
@@ -110,7 +108,6 @@
 #if defined(ENABLE_SWIFT)
 #include <Network/Swift/swift_connection.hxx>
 #endif
-#include <Cockpit/cockpitDisplayManager.hxx>
 #include <Environment/environment_mgr.hxx>
 #include <Environment/ephemeris.hxx>
 #include <FDM/fdm_shell.hxx>
@@ -1093,7 +1090,6 @@ void fgCreateSubsystems(bool duringReset) {
 #ifdef ENABLE_HUD
         mgr->add<HUD>();
 #endif
-        mgr->add<flightgear::CockpitDisplayManager>();
 
         simgear::canvas::Canvas::setSystemAdapter(
           simgear::canvas::SystemAdapterPtr(new canvas::FGCanvasSystemAdapter)

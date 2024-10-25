@@ -49,7 +49,6 @@
 #include <simgear/structure/event_mgr.hxx>
 #include <simgear/props/props_io.hxx>
 
-#include <Cockpit/panel.hxx>
 #include <Main/globals.hxx>
 #include <Main/fg_props.hxx>
 #include <Main/fg_os.hxx>

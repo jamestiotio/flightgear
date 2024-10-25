@@ -50,7 +50,6 @@
 #include <Traffic/TrafficMgr.hxx>
 #include <Network/fgcom.hxx>
 #include <Network/HTTPClient.hxx>
-#include <Cockpit/cockpitDisplayManager.hxx>
 #include <GUI/new_gui.hxx>
 #include <Main/logger.hxx>
 #include <ATC/atc_mgr.hxx>
@@ -93,7 +92,6 @@ SGSubsystem* createSubsystemByName(const std::string& name)
 #ifdef ENABLE_HUD
     MAKE_SUB(HUD, "hud");
 #endif
-    MAKE_SUB(flightgear::CockpitDisplayManager, "cockpit-displays");
     MAKE_SUB(FGRouteMgr, "route-manager");
     MAKE_SUB(FGIO, "io");
     MAKE_SUB(FGLogger, "logger");

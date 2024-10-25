@@ -77,10 +77,7 @@
 #include <simgear/math/sg_random.hxx>
 
 #include <Time/light.hxx>
-#include <Time/light.hxx>
-#include <Cockpit/panel.hxx>
 
-#include <Model/panelnode.hxx>
 #include <Model/modelmgr.hxx>
 #include <Model/acmodel.hxx>
 #include <Scenery/scenery.hxx>
@@ -589,7 +586,6 @@ FGRenderer::setupView( void )
             }
         }
 #endif
-        guiCamera->insertChild(0, FGPanelNode::create2DPanelNode());
     }
 
     osg::Switch* sw = new osg::Switch;
