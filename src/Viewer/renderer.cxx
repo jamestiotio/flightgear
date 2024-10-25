@@ -682,12 +682,9 @@ FGRenderer::update( ) {
     SGVec3f sundirection(l->sun_vec()[0], l->sun_vec()[1], l->sun_vec()[2]);
     SGVec3f moondirection(l->moon_vec()[0], l->moon_vec()[1], l->moon_vec()[2]);
 
-    _updateVisitor->setLight(sundirection,moondirection, l->scene_ambient(),
-                             l->scene_diffuse(), l->scene_specular(),
-                             l->adj_fog_color(),
+    _updateVisitor->setLight(sundirection, moondirection,
                              l->get_sun_angle()*SGD_RADIANS_TO_DEGREES);
     _updateVisitor->setVisibility(actual_visibility);
-    simgear::GroundLightManager::instance()->update(_updateVisitor.get());
 
     osg::Node::NodeMask cullMask = ~simgear::LIGHTS_BITS & ~simgear::PICK_BIT;
     cullMask |= simgear::GroundLightManager::instance()
@@ -724,10 +721,6 @@ FGRenderer::updateSky()
     sstate.sun_angle = l->get_sun_angle();
 
     SGSkyColor scolor;
-    scolor.sky_color   = SGVec3f(l->sky_color().data());
-    scolor.adj_sky_color = SGVec3f(l->adj_sky_color().data());
-    scolor.fog_color   = SGVec3f(l->adj_fog_color().data());
-    scolor.cloud_color = SGVec3f(l->cloud_color().data());
     scolor.sun_angle   = l->get_sun_angle();
     scolor.moon_angle  = l->get_moon_angle();
     scolor.altitude_m =  altitude_m;
