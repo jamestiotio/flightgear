@@ -89,6 +89,17 @@ if (MSVC)
     file(TO_NATIVE_PATH "${OSG_BASE_DIR}" INNO_SETUP_OSG_BASE_DIR)
     file(TO_NATIVE_PATH "${FINAL_MSVC_3RDPARTY_DIR}" INNO_SETUP_3RDPARTY_DIR)
 
+    if (FG_BUILD_TYPE STREQUAL "Release")
+        set(INNO_SETUP_OUT_NAME "FlightGear-${FLIGHTGEAR_VERSION}")
+    elseif(FG_BUILD_TYPE STREQUAL "Nightly")
+        string(TIMESTAMP currentDate "%Y%m%d")
+        set(INNO_SETUP_OUT_NAME "FlightGear-${currentDate}-nightly")
+    else()
+        string(TIMESTAMP currentDate "%Y%m%d")
+        set(INNO_SETUP_OUT_NAME "FlightGear-${currentDate}-dev")
+    endif()
+
+    
     configure_file(${CMAKE_SOURCE_DIR}/package/windows/InstallConfig.iss.in ${CMAKE_BINARY_DIR}/InstallConfig.iss)
     install(FILES ${CMAKE_BINARY_DIR}/InstallConfig.iss 
         DESTINATION . 
