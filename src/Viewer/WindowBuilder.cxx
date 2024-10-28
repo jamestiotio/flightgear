@@ -71,8 +71,14 @@ void WindowBuilder::makeDefaultTraits(bool stencil)
     }
 #endif
 
-
-    defaultTraits = new osg::GraphicsContext::Traits;
+    // Pass the display settings to inherit some options:
+    // - alpha bits
+    // - stencil bits
+    // - multisampling
+    // - stereo settings
+    // - GL version and profile
+    // - swap method
+    defaultTraits = new osg::GraphicsContext::Traits(osg::DisplaySettings::instance());
     auto traits = defaultTraits.get();
     
     traits->readDISPLAY();

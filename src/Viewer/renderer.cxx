@@ -289,6 +289,16 @@ FGRenderer::init( void )
 
     sgUserDataInit( globals->get_props() );
 
+    // Change some OSG display settings
+    osg::DisplaySettings* display_settings = osg::DisplaySettings::instance();
+    // Set the default OpenGL context version
+    display_settings->setGLContextVersion("4.1");   // OpenGL 4.1
+    display_settings->setGLContextProfileMask(0x1); // Core profile
+    // Don't let OSG do automatic shader generation
+    display_settings->setShaderHint(osg::DisplaySettings::SHADER_NONE, false);
+    // Add our own GLSL version
+    display_settings->setValue("FG_GLSL_VERSION", "#version 410 core");
+
     SGPropertyNode* composite_viewer_enabled_prop = fgGetNode("/sim/rendering/composite-viewer-enabled", true);
     // After we've read composite_viewer_enabled_prop here, changing its value
     // will have no affect, so mark it as read-only for clarity.
