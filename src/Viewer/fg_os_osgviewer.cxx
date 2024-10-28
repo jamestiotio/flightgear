@@ -218,7 +218,8 @@ void fgOSOpenWindow(bool stencil)
         view->getDatabasePager()->setUnrefImageDataAfterApplyPolicy(true, false);
         osg::GraphicsContext::createNewContextID();
 
-        //viewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
+        // Disable the main camera, use slaves instead
+        view->getCamera()->setGraphicsContext(nullptr);
 
         std::string mode;
         mode = fgGetString("/sim/rendering/multithreading-mode", "SingleThreaded");
