@@ -4,6 +4,11 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
+/**
+ * @file
+ * @brief implementation of XML-configurable GUI support.
+ */
+
 #include <config.h>
 
 #include "new_gui.hxx"
@@ -170,10 +175,8 @@ NewGUI::createMenuBarImplementation()
     }
 #endif
 #if defined(SG_WINDOWS)
-    if (fgGetBool("/sim/menubar/native", true)) {
-        // Windows-native menubar disabled for the moment, fall-through
-        // to our default one.
-        // _menubar.reset(new FGWindowsMenuBar);
+	if (fgGetBool("/sim/menubar/native", false)) {
+        _menubar.reset(new FGWindowsMenuBar);
     }
 #endif
     if (!_menubar.get()) {
