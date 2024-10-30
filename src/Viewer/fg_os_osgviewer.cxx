@@ -111,63 +111,6 @@ using namespace osg;
 
 osg::ref_ptr<osgViewer::Viewer> viewer;
 
-static void setStereoMode(const char* mode)
-{
-    DisplaySettings::StereoMode stereoMode = DisplaySettings::QUAD_BUFFER;
-    bool stereoOn = true;
-
-    if (strcmp(mode, "QUAD_BUFFER") == 0) {
-        stereoMode = DisplaySettings::QUAD_BUFFER;
-    } else if (strcmp(mode, "ANAGLYPHIC") == 0) {
-        stereoMode = DisplaySettings::ANAGLYPHIC;
-    } else if (strcmp(mode, "HORIZONTAL_SPLIT") == 0) {
-        stereoMode = DisplaySettings::HORIZONTAL_SPLIT;
-    } else if (strcmp(mode, "VERTICAL_SPLIT") == 0) {
-        stereoMode = DisplaySettings::VERTICAL_SPLIT;
-    } else if (strcmp(mode, "LEFT_EYE") == 0) {
-        stereoMode = DisplaySettings::LEFT_EYE;
-    } else if (strcmp(mode, "RIGHT_EYE") == 0) {
-        stereoMode = DisplaySettings::RIGHT_EYE;
-    } else if (strcmp(mode, "HORIZONTAL_INTERLACE") == 0) {
-        stereoMode = DisplaySettings::HORIZONTAL_INTERLACE;
-    } else if (strcmp(mode, "VERTICAL_INTERLACE") == 0) {
-        stereoMode = DisplaySettings::VERTICAL_INTERLACE;
-    } else if (strcmp(mode, "CHECKERBOARD") == 0) {
-        stereoMode = DisplaySettings::CHECKERBOARD;
-    } else {
-        stereoOn = false;
-    }
-    DisplaySettings::instance()->setStereo(stereoOn);
-    DisplaySettings::instance()->setStereoMode(stereoMode);
-}
-
-static const char* getStereoMode()
-{
-    DisplaySettings::StereoMode stereoMode = DisplaySettings::instance()->getStereoMode();
-    bool stereoOn = DisplaySettings::instance()->getStereo();
-    if (!stereoOn) return "OFF";
-    if (stereoMode == DisplaySettings::QUAD_BUFFER) {
-        return "QUAD_BUFFER";
-    } else if (stereoMode == DisplaySettings::ANAGLYPHIC) {
-        return "ANAGLYPHIC";
-    } else if (stereoMode == DisplaySettings::HORIZONTAL_SPLIT) {
-        return "HORIZONTAL_SPLIT";
-    } else if (stereoMode == DisplaySettings::VERTICAL_SPLIT) {
-        return "VERTICAL_SPLIT";
-    } else if (stereoMode == DisplaySettings::LEFT_EYE) {
-        return "LEFT_EYE";
-    } else if (stereoMode == DisplaySettings::RIGHT_EYE) {
-        return "RIGHT_EYE";
-    } else if (stereoMode == DisplaySettings::HORIZONTAL_INTERLACE) {
-        return "HORIZONTAL_INTERLACE";
-    } else if (stereoMode == DisplaySettings::VERTICAL_INTERLACE) {
-        return "VERTICAL_INTERLACE";
-    } else if (stereoMode == DisplaySettings::CHECKERBOARD) {
-        return "CHECKERBOARD";
-    }
-    return "OFF";
-}
-
 class NotifyLevelListener : public SGPropertyChangeListener
 {
 public:
@@ -314,17 +257,6 @@ void fgOSResetProperties()
         fgSetInt("/sim/startup/xsize", guiViewport->width());
         fgSetInt("/sim/startup/ysize", guiViewport->height());
     }
-
-    DisplaySettings* displaySettings = DisplaySettings::instance();
-    fgTie("/sim/rendering/osg-displaysettings/split-stereo-autoadjust-aspect-ratio", displaySettings, &DisplaySettings::getSplitStereoAutoAdjustAspectRatio, &DisplaySettings::setSplitStereoAutoAdjustAspectRatio);
-    fgTie("/sim/rendering/osg-displaysettings/eye-separation", displaySettings, &DisplaySettings::getEyeSeparation, &DisplaySettings::setEyeSeparation);
-    fgTie("/sim/rendering/osg-displaysettings/screen-distance", displaySettings, &DisplaySettings::getScreenDistance, &DisplaySettings::setScreenDistance);
-    fgTie("/sim/rendering/osg-displaysettings/screen-width", displaySettings, &DisplaySettings::getScreenWidth, &DisplaySettings::setScreenWidth);
-    fgTie("/sim/rendering/osg-displaysettings/screen-height", displaySettings, &DisplaySettings::getScreenHeight, &DisplaySettings::setScreenHeight);
-    fgTie("/sim/rendering/osg-displaysettings/stereo-mode", getStereoMode, setStereoMode);
-    fgTie("/sim/rendering/osg-displaysettings/double-buffer", displaySettings, &DisplaySettings::getDoubleBuffer, &DisplaySettings::setDoubleBuffer);
-    fgTie("/sim/rendering/osg-displaysettings/depth-buffer", displaySettings, &DisplaySettings::getDepthBuffer, &DisplaySettings::setDepthBuffer);
-    fgTie("/sim/rendering/osg-displaysettings/rgb", displaySettings, &DisplaySettings::getRGB, &DisplaySettings::setRGB);
 
     fgTie("/sim/rendering/database-pager/threads", &getNumDatabaseThreads, &setNumDatabaseThreads);
 
