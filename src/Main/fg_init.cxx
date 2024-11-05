@@ -1539,11 +1539,3 @@ int fgUninstall()
 #endif
     return EXIT_SUCCESS;
 }
-
-void fgExit(int status)
-{
-#if defined(HAVE_QT)
-    flightgear::shutdownQtApp();
-#endif
-    exit(status);
-}

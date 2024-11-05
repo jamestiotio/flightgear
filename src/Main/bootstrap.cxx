@@ -427,3 +427,12 @@ void fgExitCleanup() {
     simgear::shutdownLogging();
     flightgear::shutdownSentry();
 }
+
+void fgExit(int status)
+{
+#if defined(HAVE_QT)
+    flightgear::shutdownQtApp();
+#endif
+    exit(status);
+}
+
