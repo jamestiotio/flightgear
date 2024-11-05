@@ -2687,9 +2687,9 @@ void Options::processArgResult(int result)
     }
     devices.clear();
     smgr.stop();
-    exit(0);
+    fgExit(0);
   } else if (result == FG_OPTIONS_EXIT) {
-    exit(0);
+    fgExit(0);
   }
 }
 
