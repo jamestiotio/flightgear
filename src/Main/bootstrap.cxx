@@ -67,7 +67,6 @@
 #include <Main/sentryIntegration.hxx>
 #include <Navaids/NavDataCache.hxx>
 #include <Viewer/fgviewer.hxx>
-#include <flightgearBuildId.h>
 
 #include "fg_os.hxx"
 

@@ -49,7 +49,6 @@
 #include <Viewer/WindowSystemAdapter.hxx>
 #include <Viewer/renderer.hxx>
 #include <Viewer/splash.hxx>
-#include <flightgearBuildId.h>
 
 #include "fg_commands.hxx"
 #include "fg_init.hxx"
@@ -609,8 +608,7 @@ int fgMainInit( int argc, char **argv )
     SG_LOG( SG_GENERAL, SG_INFO, "FlightGear:  Version " << version );
     SG_LOG( SG_GENERAL, SG_INFO, "FlightGear:  Build Type " << FG_BUILD_TYPE );
     SG_LOG( SG_GENERAL, SG_INFO, "Built with " << SG_COMPILER_STR);
-	SG_LOG( SG_GENERAL, SG_INFO, "Jenkins number/ID " << JENKINS_BUILD_NUMBER << ":"
-			<< JENKINS_BUILD_ID);
+
 
     flightgear::addSentryTag("osg-version", osgGetVersion());
     
