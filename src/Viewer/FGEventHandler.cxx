@@ -15,11 +15,33 @@
 #include "renderer.hxx"
 #include "sview.hxx"
 
-#ifdef SG_MAC
-// hack - during interactive resize on Mac, OSG queues and then flushes
-// a large number of resize events, without doing any drawing.
-extern void puCleanUpJunk ( void ) ;
-#endif
+/*
+  WARNING: These have to be the same as PW_KEY_whatever and also
+  the same as (GLUT_KEY_whatever+256)
+*/
+#define PU_KEY_GLUT_SPECIAL_OFFSET  256
+
+#define PU_KEY_F1        (1             + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_F2        (2             + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_F3        (3             + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_F4        (4             + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_F5        (5             + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_F6        (6             + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_F7        (7             + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_F8        (8             + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_F9        (9             + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_F10       (10            + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_F11       (11            + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_F12       (12            + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_LEFT      (100           + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_UP        (101           + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_RIGHT     (102           + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_DOWN      (103           + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_PAGE_UP   (104           + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_PAGE_DOWN (105           + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_HOME      (106           + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_END       (107           + PU_KEY_GLUT_SPECIAL_OFFSET)
+#define PU_KEY_INSERT    (108           + PU_KEY_GLUT_SPECIAL_OFFSET)
 
 namespace flightgear
 {
