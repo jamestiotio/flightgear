@@ -7,7 +7,6 @@
 #include <osg/Viewport>
 #include <osgViewer/Viewer>
 
-#include <GUI/FlightGear_pu.h>
 #include <Main/fg_props.hxx>
 #include "CameraGroup.hxx"
 #include "FGEventHandler.hxx"
@@ -310,12 +309,6 @@ bool FGEventHandler::handle(const osgGA::GUIEventAdapter& ea,
           globals->get_renderer()->resize(ea.getWindowWidth(), ea.getWindowHeight(), ea.getWindowX(), ea.getWindowY());
         }
         statsHandler->handle(ea, us);
-      #ifdef SG_MAC
-        // work around OSG Cocoa-Viewer issue with resize event handling,
-        // where resize events are queued up, then dispatched in a batch, with
-        // no interveningd drawing calls.
-        puCleanUpJunk();
-      #endif
         return true;
      case osgGA::GUIEventAdapter::CLOSE_WINDOW:
         if (!isMainWindow(ea, us)) {
