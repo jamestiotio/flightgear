@@ -538,6 +538,8 @@ include_directories(${PROJECT_BINARY_DIR}/src) # for version.h
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
 
+include(OSGHelpers)
+
 #######################################################################
 
 include(SetupFGFSIncludes)

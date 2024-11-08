@@ -123,7 +123,13 @@ if (MSVC)
   file(TO_NATIVE_PATH "${FG_QT_BIN_DIR}" _qt_bin_dir_native)
   file(TO_NATIVE_PATH "${FINAL_MSVC_3RDPARTY_DIR}/bin" _msvc_3rdparty_bin_dir)
   file(TO_NATIVE_PATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}" _install_bin_dir)
+  file(TO_NATIVE_PATH "${OSG_BASE_DIR}/bin" _osg_bin_dir_native)
+
+  file(TO_NATIVE_PATH "${FG_QT_BIN_DIR}/../plugins" _qt_plugin_dir_native)
+  file(TO_NATIVE_PATH "${FG_QT_BIN_DIR}/../qml" _qt_qml_dir_native)
 
   set_property(TARGET fgfs PROPERTY
-  VS_GLOBAL_LocalDebuggerEnvironment "PATH=${_install_bin_dir};${_msvc_3rdparty_bin_dir};${_qt_bin_dir_native}")
+  VS_GLOBAL_LocalDebuggerEnvironment 
+    "PATH=${_osg_bin_dir_native};${_install_bin_dir};${_msvc_3rdparty_bin_dir};${_qt_bin_dir_native}\nQT_PLUGIN_PATH=${_qt_plugin_dir_native}\nQML_IMPORT_PATH=${_qt_qml_dir_native}"
+)
 endif()
