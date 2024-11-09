@@ -301,8 +301,7 @@ static void fgIdleFunction ( void ) {
     auto mgr = globals->get_subsystem_mgr();
 
     if ( idle_state == 0 ) {
-        auto camera = flightgear::getGUICamera(flightgear::CameraGroup::getDefault());
-        if (guiInit(camera->getGraphicsContext())) {
+        if (globals->get_renderer()->runInitOperation()) {
             checkOpenGLVersion();
             fgSetVideoOptions();
             idle_state+=2;
@@ -411,11 +410,10 @@ static void fgIdleFunction ( void ) {
         // setup OpenGL view parameters
         globals->get_renderer()->setupView();
 
-        globals->get_renderer()->resize( fgGetInt("/sim/startup/xsize"),
-                                         fgGetInt("/sim/startup/ysize") );
+        globals->get_renderer()->resize(fgGetInt("/sim/startup/xsize"),
+                                        fgGetInt("/sim/startup/ysize"));
         WindowSystemAdapter::getWSA()->windows[0]->gc->add(
-          new simgear::canvas::VGInitOperation()
-        );
+            new simgear::canvas::VGInitOperation());
 
         int session = fgGetInt("/sim/session",0);
         session++;
@@ -545,7 +543,7 @@ int fgMainInit( int argc, char **argv )
     auto initHomeResult = fgInitHome();
     if (initHomeResult == InitHomeAbort) {
         flightgear::fatalMessageBoxThenExit("Unable to create lock file",
-                                "Flightgear was unable to create the lock file in FG_HOME");
+                                "FlightGear was unable to create the lock file in FG_HOME");
     }
     
 #if defined(HAVE_QT)
@@ -560,7 +558,7 @@ int fgMainInit( int argc, char **argv )
 
 #if defined(HAVE_QT)
     if (showLauncher && (initHomeResult == InitHomeReadOnly)) {
-// show this message early, if we can
+        // show this message early, if we can
         auto r = flightgear::showLockFileDialog();
         if (r == flightgear::LockFileReset) {
             SG_LOG( SG_GENERAL, SG_MANDATORY_INFO, "Deleting lock file at user request");
@@ -746,7 +744,7 @@ int fgMainInit( int argc, char **argv )
     fgOSOpenWindow(true /* request stencil buffer */);
     fgOSResetProperties();
 
-    globals->get_renderer()->preinit();
+    globals->get_renderer()->postinit();
 
     fgOutputSettings();
 

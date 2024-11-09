@@ -64,8 +64,7 @@ FGEventHandler::FGEventHandler() :
     resizable(true),
     mouseWarped(false),
     scrollButtonPressed(false),
-    changeStatsCameraRenderOrder(false),
-    m_composite_viewer_enabled(fgGetNode("/sim/rendering/composite-viewer-enabled", true))
+    changeStatsCameraRenderOrder(false)
 {
     using namespace osgGA;
     statsHandler->setKeyEventTogglesOnScreenStats(displayStatsKey);
@@ -122,9 +121,8 @@ FGEventHandler::eventToViewport(const osgGA::GUIEventAdapter& ea, osgGA::GUIActi
     
     osg::Viewport* vport;
     
-    if (m_composite_viewer_enabled->getBoolValue()
-            && eventGC != main_window->gc.get()) {
-        // CompositeViewer is enabled and this is not the main window.
+    if (eventGC != main_window->gc.get()) {
+        // This is not the main window.
         simgear::compositor::Compositor* compositor = SviewGetEventViewport(ea);
         if (!compositor) {
             SG_LOG(SG_GENERAL, SG_DEBUG, "SviewGetEventViewport() returned nullptr");

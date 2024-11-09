@@ -98,18 +98,9 @@ USE_OSGPLUGIN(osg);
 USE_OSGPLUGIN(txf);
 #endif
 
-// fg_os implementation using OpenSceneGraph's osgViewer::Viewer class
-// to create the graphics window and run the event/update/render loop.
-
-//
-// fg_os implementation
-//
-
 using namespace std;
 using namespace flightgear;
 using namespace osg;
-
-osg::ref_ptr<osgViewer::Viewer> viewer;
 
 class NotifyLevelListener : public SGPropertyChangeListener
 {
@@ -145,12 +136,8 @@ void fgOSOpenWindow(bool stencil)
 
     auto composite_viewer = dynamic_cast<osgViewer::CompositeViewer*>(
         globals->get_renderer()->getViewerBase());
-    if (0) {
-    } else if (composite_viewer) {
-        /* We are using CompositeViewer. */
-        SG_LOG(SG_VIEW, SG_DEBUG, "Using CompositeViewer");
+    if (composite_viewer) {
         osgViewer::ViewerBase* viewer = globals->get_renderer()->getViewerBase();
-        SG_LOG(SG_VIEW, SG_DEBUG, "Creating osgViewer::View");
         osgViewer::View* view = new osgViewer::View;
         view->setFrameStamp(composite_viewer->getFrameStamp());
         globals->get_renderer()->setView(view);
@@ -192,45 +179,9 @@ void fgOSOpenWindow(bool stencil)
         viewer->setKeyEventSetsDone(0);
         // The viewer won't start without some root.
         view->setSceneData(new osg::Group);
-        globals->get_renderer()->setView(view);
-    } else {
-        /* Not using CompositeViewer. */
-        SG_LOG(SG_VIEW, SG_DEBUG, "Not CompositeViewer.");
-        SG_LOG(SG_VIEW, SG_DEBUG, "Creating osgViewer::Viewer");
-        viewer = new osgViewer::Viewer;
-        viewer->setDatabasePager(FGScenery::getPagerSingleton());
-
-        std::string mode;
-        mode = fgGetString("/sim/rendering/multithreading-mode", "SingleThreaded");
-        flightgear::addSentryTag("osg-thread-mode", mode);
-
-        if (mode == "AutomaticSelection")
-            viewer->setThreadingModel(osgViewer::Viewer::AutomaticSelection);
-        else if (mode == "CullDrawThreadPerContext")
-            viewer->setThreadingModel(osgViewer::Viewer::CullDrawThreadPerContext);
-        else if (mode == "DrawThreadPerContext")
-            viewer->setThreadingModel(osgViewer::Viewer::DrawThreadPerContext);
-        else if (mode == "CullThreadPerCameraDrawThreadPerContext")
-            viewer->setThreadingModel(osgViewer::Viewer::CullThreadPerCameraDrawThreadPerContext);
-        else
-            viewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
-        WindowBuilder::initWindowBuilder(stencil);
-        CameraGroup::buildDefaultGroup(viewer.get());
-
-        FGEventHandler* manipulator = globals->get_renderer()->getEventHandler();
-        WindowSystemAdapter* wsa = WindowSystemAdapter::getWSA();
-        if (wsa->windows.size() != 1) {
-            manipulator->setResizable(false);
-        }
-        viewer->getCamera()->setProjectionResizePolicy(osg::Camera::FIXED);
-        viewer->addEventHandler(manipulator);
-        // Let FG handle the escape key with a confirmation
-        viewer->setKeyEventSetsDone(0);
-        // The viewer won't start without some root.
-        viewer->setSceneData(new osg::Group);
-        globals->get_renderer()->setView(viewer.get());
     }
 }
+
 SGPropertyNode *simHost = 0, *simFrameCount, *simTotalHostTime, *simFrameResetCount, *frameWait;
 
 // Getter/Setter to work around lack of unsigned int properties.  Note that we have a minimum of 1 DB thread as otherwise
@@ -386,11 +337,10 @@ int fgOSMainLoop()
     if (!viewer_base->isRealized()) {
         viewer_base->realize();
         std::string affinity = fgGetString("/sim/thread-cpu-affinity");
-        SG_LOG(SG_VIEW, SG_ALERT, "affinity=" << affinity);
         if (affinity != "") {
             ShowAffinities();
             if (affinity == "osg") {
-                SG_LOG(SG_VIEW, SG_ALERT, "Resetting affinity of current thread getpid()=" << getpid());
+                SG_LOG(SG_VIEW, SG_INFO, "Resetting affinity of current thread getpid()=" << getpid());
                 OpenThreads::Affinity affinity;
                 OpenThreads::SetProcessorAffinityOfCurrentThread(affinity);
                 ShowAffinities();
@@ -485,7 +435,6 @@ void fgOSCloseWindow()
     flightgear::addSentryBreadcrumb("fgOSCloseWindow, clearing camera group", "info");
     flightgear::CameraGroup::setDefault(NULL);
     WindowSystemAdapter::setWSA(NULL);
-    viewer = NULL;
 }
 
 void fgOSFullScreen()

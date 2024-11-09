@@ -37,7 +37,6 @@
 #include "VRManager.hxx"
 #include "renderer.hxx"
 #include "splash.hxx"
-#include <GUI/gui.h>
 #include <Main/fg_os.hxx>
 #include <Main/fg_props.hxx>
 #include <Main/globals.hxx>
@@ -644,7 +643,7 @@ std::string SplashScreen::selectSplashImage()
 
 void SplashScreen::doUpdate()
 {
-    if (!guiInit()) {
+    if (!globals->get_renderer()->runInitOperation()) {
         // don't createNodes until OSG init operations have completed
         return;
     }

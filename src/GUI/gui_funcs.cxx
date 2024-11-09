@@ -46,6 +46,7 @@
 #include <simgear/debug/logstream.hxx>
 #include <simgear/misc/sg_path.hxx>
 #include <simgear/screen/screen-dump.hxx>
+#include <simgear/structure/commands.hxx>
 #include <simgear/structure/event_mgr.hxx>
 #include <simgear/props/props_io.hxx>
 
@@ -456,9 +457,22 @@ void fgPrintVisibleSceneInfoCommand()
         master_freeze->setBoolValue(true);
     }
 
-    flightgear::printVisibleSceneInfo(globals->get_renderer());
+    fgPrintVisibleSceneInfo(globals->get_renderer());
 
     if ( !freeze ) {
         master_freeze->setBoolValue(false);
+    }
+}
+
+void syncPausePopupState()
+{
+    bool paused = fgGetBool("/sim/freeze/master", true) || fgGetBool("/sim/freeze/clock", true);
+    SGPropertyNode_ptr args(new SGPropertyNode);
+    args->setStringValue("id", "sim-pause");
+    if (paused && fgGetBool("/sim/view-name-popup")) {
+        args->setStringValue("label", "Simulation is paused");
+        globals->get_commands()->execute("show-message", args, nullptr);
+    } else {
+        globals->get_commands()->execute("clear-message", args, nullptr);
     }
 }

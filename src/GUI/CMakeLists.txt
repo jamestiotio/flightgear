@@ -2,7 +2,6 @@ include(FlightGearComponent)
 
 set(SOURCES
     dialog.cxx
-    gui.cxx
     gui_funcs.cxx
     menubar.cxx
     new_gui.cxx

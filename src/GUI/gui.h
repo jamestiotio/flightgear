@@ -29,8 +29,6 @@ namespace osg
 {
 class GraphicsContext;
 }
-// gui.cxx
-extern bool guiInit(osg::GraphicsContext* gc = nullptr);
 
 extern bool openBrowser(const std::string& address);
 extern void mkDialog(const char *txt);

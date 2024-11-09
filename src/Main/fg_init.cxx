@@ -149,8 +149,6 @@ using std::cout;
 
 using namespace simgear::pkg;
 
-extern osg::ref_ptr<osgViewer::Viewer> viewer;
-
 // Return the current base package version
 string fgBasePackageVersion(const SGPath& base_path) {
     SGPath p(base_path);
@@ -1403,44 +1401,28 @@ void fgStartNewReset()
     fgInitAircraftPaths(true);
     fgInitAircraft(true, false /* not from launcher */);
     
-    render = new FGRenderer(composite_viewer);
+    render = new FGRenderer;
+    render->setCompositeViewer(composite_viewer);
     render->setEventHandler(eventHandler);
     eventHandler->reset();
     globals->set_renderer(render);
     render->init();
-    
-    if (composite_viewer) {
-        render->setView(composite_viewer_view);
-    }
-    else {
-        render->setView(viewer.get());
-    }
-
-    sgUserDataInit( globals->get_props() );
+    render->setView(composite_viewer_view);
 
     unsigned int numDBPagerThreads = std::max(fgGetNode("/sim/rendering/database-pager/threads", true)->getIntValue(1), 1);
+    composite_viewer_view->setDatabasePager(FGScenery::getPagerSingleton());
+    composite_viewer_view->getDatabasePager()->setUnrefImageDataAfterApplyPolicy(true, false);
+    composite_viewer_view->getDatabasePager()->setUpThreads(numDBPagerThreads, 0);
+    composite_viewer_view->getDatabasePager()->setAcceptNewDatabaseRequests(true);
+    composite_viewer_view->setFrameStamp(composite_viewer->getFrameStamp());
 
-    if (composite_viewer) {
-        composite_viewer_view->setDatabasePager(FGScenery::getPagerSingleton());
-        composite_viewer_view->getDatabasePager()->setUnrefImageDataAfterApplyPolicy(true, false);
-        composite_viewer_view->getDatabasePager()->setUpThreads(numDBPagerThreads, 0);
-        composite_viewer_view->getDatabasePager()->setAcceptNewDatabaseRequests(true);
-        flightgear::CameraGroup::buildDefaultGroup(composite_viewer_view);
-        composite_viewer_view->setFrameStamp(composite_viewer->getFrameStamp());
-        osg::GraphicsContext::createNewContextID();
-        render->setView(composite_viewer_view);
-        render->preinit();
-        composite_viewer->startThreading();
-    }
-    else {
-        viewer->getDatabasePager()->setUpThreads(numDBPagerThreads, 0);
-        viewer->getDatabasePager()->setAcceptNewDatabaseRequests(true);
-        // must do this before preinit for Rembrandthe
-        flightgear::CameraGroup::buildDefaultGroup(viewer.get());
-        render->preinit();
-        viewer->startThreading();
-    }
-    
+    flightgear::CameraGroup::buildDefaultGroup(composite_viewer_view);
+    osg::GraphicsContext::createNewContextID();
+
+    render->setView(composite_viewer_view);
+    render->postinit();
+    composite_viewer->startThreading();
+
     fgOSResetProperties();
 
 // init some things manually
