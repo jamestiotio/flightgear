@@ -94,6 +94,12 @@ string(STRIP "${versionFile}" FLIGHTGEAR_VERSION)
 # add a dependency on the version file
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS version)
 
+# split version string into components, note CMAKE_MATCH_0 is the entire regexp match
+string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)" VERSION_REGEX ${FLIGHTGEAR_VERSION})
+set(FLIGHTGEAR_MAJOR_VERSION ${CMAKE_MATCH_1})
+set(FLIGHTGEAR_MINOR_VERSION ${CMAKE_MATCH_2})
+set(FLIGHTGEAR_PATCH_VERSION ${CMAKE_MATCH_3})
+
 # FlightGear packaging (to build a source tarball)
 include( ConfigureCPack )
 
@@ -378,13 +384,7 @@ endif (ENABLE_QT)
 ##############################################################################
 
 # FlightGear and SimGear versions need to match major + minor
-# split version string into components, note CMAKE_MATCH_0 is the entire regexp match
-string(REGEX MATCH "([0-9]+)\\.([0-9]+)\\.([0-9]+)" VERSION_REGEX ${FLIGHTGEAR_VERSION} )
-set(FG_VERSION_MAJOR ${CMAKE_MATCH_1})
-set(FG_VERSION_MINOR ${CMAKE_MATCH_2})
-set(FG_VERSION_PATCH ${CMAKE_MATCH_3})
-
-set(MIN_SIMGEAR_VERSION "${FG_VERSION_MAJOR}.${FG_VERSION_MINOR}.0")
+set(MIN_SIMGEAR_VERSION "${FLIGHTGEAR_MAJOR_VERSION}.${FLIGHTGEAR_MINOR_VERSION}.0")
 message(STATUS "Min Simgear version is ${MIN_SIMGEAR_VERSION}")
 
 find_package(SimGear ${MIN_SIMGEAR_VERSION} CONFIG REQUIRED)
