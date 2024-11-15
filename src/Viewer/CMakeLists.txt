@@ -14,6 +14,7 @@ set(SOURCES
 	viewmgr.cxx
 	sview.cxx
 	GraphicsPresets.cxx
+	PluginLoader.cxx
 	)
 
 set(HEADERS
