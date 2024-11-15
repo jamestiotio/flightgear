@@ -765,6 +765,7 @@ int fgMainInit( int argc, char **argv )
 #endif
 
     simgear::clearEffectCache();
+    simgear::canvas::vgShutdown();
 
     // clean up here; ensure we null globals to avoid
     // confusing the atexit() handler
