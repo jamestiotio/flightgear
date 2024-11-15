@@ -6,7 +6,7 @@
 variables:
   BUILD_DIR: "$CI_PROJECT_DIR/build"
   PREFIX_DIR: "$CI_PROJECT_DIR/dist"
-  OSG_REF: fgfs-osg-36-2
+  OSG_REF: next
   BRANCH_REF: next
   # create a root dir *above* the Simgear checkout, otherwise CMake
   # complains about INTERFACE_INCLUDE_DIRECTORIES being the source dir
