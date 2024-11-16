@@ -117,7 +117,9 @@ void fgOSOpenWindow(bool stencil)
 
         // https://www.mail-archive.com/osg-users@lists.openscenegraph.org/msg29820.html
         view->getDatabasePager()->setUnrefImageDataAfterApplyPolicy(true, false);
-        osg::GraphicsContext::createNewContextID();
+        // XXX: Creating a new context ID makes FG segfault/double free at exit.
+        // Comment this for now...
+        // osg::GraphicsContext::createNewContextID();
 
         // Disable the main camera, use slaves instead
         view->getCamera()->setGraphicsContext(nullptr);
