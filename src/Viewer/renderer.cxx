@@ -759,7 +759,7 @@ FGRenderer::removeCanvasCamera(osg::Camera* camera)
     auto view = _composite_viewer->getView(0);
     unsigned int index = view->findSlaveIndexForCamera(camera);
     if (index < view->getNumSlaves()) {
-        _composite_viewer->getView(0)->removeSlave(index);
+        view->removeSlave(index);
     } else {
         SG_LOG(SG_GL, SG_WARN, "Attempted to remove unregistered Canvas camera");
     }
