@@ -348,19 +348,6 @@ int main ( int argc, char **argv )
         // is possible inside fgExitCleanup
         sglog();
 
-
-#if OSG_VERSION_LESS_THAN(3, 5, 0)
-        // similar to above, ensure some static maps inside OSG exist before
-        // we register our at-exit handler, otherwise the statics are gone
-        // when fg_terminate runs, which causes crashes.
-        osg::Texture::getTextureObjectManager(0);
-        osg::GLBufferObjectManager::getGLBufferObjectManager(0);
-
-        // ensure this is called early (and hence deleted) late,
-        // otherwise fgExitCleanup crahses: see
-        // Sentry FLIGHTEAR-M68
-        osgText::Font::getDefaultFont();
-#endif
         std::set_terminate(fg_terminate);
         atexit(fgExitCleanup);
         

@@ -64,7 +64,7 @@ void WindowBuilder::makeDefaultTraits(bool stencil)
 {
     GraphicsContext::WindowingSystemInterface* wsi
         = osg::GraphicsContext::getWindowingSystemInterface();
-#if defined(HAVE_QT) && OSG_VERSION_GREATER_THAN(3, 5, 9)
+#if defined(HAVE_QT)
     if (usingQtGraphicsWindow) {
         // use the correct WSI for OpenSceneGraph >= 3.6
         wsi = osg::GraphicsContext::getWindowingSystemInterface("FlightGearQt5");
