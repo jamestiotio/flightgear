@@ -279,19 +279,15 @@ private:
 
 enum class OpenGLStatus
 {
-    OpenGL21,
-    Unknown,
-    GDIGeneric,
-    Intel14
+    OpenGL41,
+    Unknown
 };
 
 OpenGLStatus checkForWorkingOpenGL()
 {
-    // request an OpenGL comptability profile, version 2.1
-    // anything lower and we'll crash
     QSurfaceFormat fmt;
-    fmt.setProfile(QSurfaceFormat::CompatibilityProfile);
-    fmt.setMajorVersion(2);
+    fmt.setProfile(QSurfaceFormat::CoreProfile);
+    fmt.setMajorVersion(4);
     fmt.setMinorVersion(1);
 
     QOpenGLContext ctx;
@@ -309,18 +305,7 @@ OpenGLStatus checkForWorkingOpenGL()
     offSurface.create();
 
     if (ctx.makeCurrent(&offSurface)) {
-        result = OpenGLStatus::OpenGL21;
-        std::string renderer = (char*)glGetString(GL_RENDERER);
-        if (renderer == "GDI Generic") {
-            flightgear::addSentryBreadcrumb("Detected GDI generic renderer", "info");
-            result = OpenGLStatus::GDIGeneric;
-        } else if (simgear::strutils::starts_with(renderer, "Intel")) {
-            if (ctx.format().majorVersion() < 2) {
-                flightgear::addSentryBreadcrumb("Detected Intel < 2.1 renderer", "info");
-                result = OpenGLStatus::Intel14;
-            }
-        }
-
+        result = OpenGLStatus::OpenGL41;
         // ensure the context is no longer current on the offscreen
         ctx.doneCurrent();
     }
@@ -435,7 +420,7 @@ void initApp(int& argc, char** argv, bool doInitQSettings)
 		// leave things unset here, so users can use env var
 		// QT_AUTO_SCREEN_SCALE_FACTOR=1 to enable it at runtime
 
-#if !defined (SG_WINDOWS)
+#if !defined (SG_WINDOWS) && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
         QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
         static_qApp.reset(new QApplication(s_argc, argv));
@@ -640,7 +625,7 @@ void launcherSetSceneryPaths()
 bool runLauncherDialog()
 {
     auto glCheckResult = checkForWorkingOpenGL();
-    if (glCheckResult != OpenGLStatus::OpenGL21) {
+    if (glCheckResult != OpenGLStatus::OpenGL41) {
         QMessageBox::critical(nullptr, "Failed to find graphics drivers",
                               "This computer is missing suitable graphics drivers (OpenGL) to run FlightGear. "
                               "Please download and install drivers from your graphics card vendor.");
