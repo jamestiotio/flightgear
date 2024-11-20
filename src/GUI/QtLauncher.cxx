@@ -70,7 +70,6 @@
 #include <Main/locale.hxx>
 #include <Main/options.hxx>
 #include <Network/HTTPClient.hxx>
-#include <Viewer/WindowBuilder.hxx>
 
 #include "LaunchConfig.hxx"
 #include "LauncherMainWindow.hxx"
@@ -91,6 +90,14 @@ using namespace flightgear;
 using namespace simgear::pkg;
 using std::string;
 
+#if defined(OSG_OPENGL)
+  #error "Don't include osg/GL in this file, it will cause problems"
+#endif
+// this function is defined in WindowBuilder.cxx, but we can't include that here, since
+// it will mean we include <osg/GL>, and we *also* include <QOpenGLContext> here, and including
+// both is *bad*. So we just declare this function, implement it in WindowBuilder.cxx, and ensure
+// we don't include any OSG headers here
+extern void fgqt_setPoseAsStandaloneApp(bool b);
 namespace { // anonymous namespace
 
 struct ProgressLabel {
@@ -368,7 +375,7 @@ void selectUITranslation()
     QStringList uiLanguages = QLocale::system().uiLanguages();
     //qWarning() << "UI languages:" << uiLanguages;
 
-    for (QString locale : qAsConst(uiLanguages)) {
+    for (auto locale : uiLanguages) {
         // remove script if it exists, eg zh-Hans-CN -> zh-CN
         locale = QLocale(locale).name();
         locale.replace('-', '_');
@@ -677,7 +684,7 @@ bool runLauncherDialog()
 
     // avoid double Apple menu and other weirdness if both Qt and OSG
     // try to initialise various Cocoa structures.
-    flightgear::WindowBuilder::setPoseAsStandaloneApp(false);
+    fgqt_setPoseAsStandaloneApp(false);
 
     LauncherMainWindow dlg(false);
 

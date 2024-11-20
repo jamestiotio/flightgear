@@ -33,6 +33,13 @@
 using namespace std;
 using namespace osg;
 
+// forwarding proxy from QtLauncher.cxx to avoid weird double-gl.h include
+// errors from MSVC
+void fgqt_setPoseAsStandaloneApp(bool b)
+{
+    flightgear::WindowBuilder::setPoseAsStandaloneApp(b);
+}
+
 namespace flightgear
 {
 string makeName(const string& prefix, int num)
