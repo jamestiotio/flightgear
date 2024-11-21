@@ -913,13 +913,16 @@ FGGlobals::saveUserSettings(SGPath userDataPath)
 
       SGPath autosaveFile = autosaveFilePath(userDataPath);
       autosaveFile.create_dir( 0700 );
-      SG_LOG(SG_IO, SG_INFO, "Saving user settings to " << autosaveFile);
+
+      SGPath tmpFile = autosaveFile.dirPath() / "autosave.tmp";
+      SG_LOG(SG_IO, SG_DEBUG, "Saving user settings to " << tmpFile);
       try {
-        writeProperties(autosaveFile, globals->get_props(), false, SGPropertyNode::USERARCHIVE);
+        writeProperties(tmpFile, globals->get_props(), false, SGPropertyNode::USERARCHIVE);
+        tmpFile.rename(autosaveFile);
+        SG_LOG(SG_IO, SG_INFO, "Saved user settings to " << autosaveFile);
       } catch (const sg_exception &e) {
         guiErrorMessage("Error writing autosave:", e);
       }
-      SG_LOG(SG_INPUT, SG_DEBUG, "Finished Saving user settings");
     }
 }
 
