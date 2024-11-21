@@ -26,8 +26,6 @@ class FGEventHandler;
 class SGSky;
 class SGUpdateVisitor;
 class SplashScreen;
-class QQuickDrawable;
-
 
 class FGRenderer final {
 public:
@@ -142,8 +140,6 @@ private:
     SGPropertyChangeListenerVec _listeners;
 
     osg::ref_ptr<SplashScreen> _splash;
-
-    QQuickDrawable* _quickDrawable;
 
     // NOTE: Raw pointer, must be deleted in destructor
     SGSky* _sky;
