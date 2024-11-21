@@ -244,10 +244,6 @@ void fgSetDefaults ()
     v->setValueReadOnly("flightgear", FLIGHTGEAR_VERSION);
     v->setValueReadOnly("simgear", SG_STRINGIZE(SIMGEAR_VERSION));
     v->setValueReadOnly("openscenegraph", osgGetVersion());
-#if OSG_VERSION_LESS_THAN(3,5,2)
-    v->setValueReadOnly("openscenegraph-thread-safe-reference-counting",
-                         osg::Referenced::getThreadSafeReferenceCounting());
-#endif
     v->setValueReadOnly("revision", REVISION);
     v->setValueReadOnly("build-number", JENKINS_BUILD_NUMBER);
     v->setValueReadOnly("build-id", JENKINS_BUILD_ID);
