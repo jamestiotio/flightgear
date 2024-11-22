@@ -62,6 +62,12 @@ public:
 
     void setGeometry(const SGRectd& g);
 
+    bool visible() const;
+    bool enabled() const;
+
+    void setVisible(bool v);
+    void setEnabled(bool e);
+
 protected:
     PUICompatObject(naRef impl, const std::string& type);
 

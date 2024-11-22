@@ -58,6 +58,8 @@ void PUICompatObject::setupGhost(nasal::Hash& compatModule)
         .member("children", &PUICompatObject::children)
         .member("dialog", &PUICompatObject::dialog)
         .member("parent", &PUICompatObject::parent)
+        .member("visible", &PUICompatObject::visible, &PUICompatObject::setVisible)
+        .member("enabled", &PUICompatObject::enabled, &PUICompatObject::setEnabled)
         .method("show", &PUICompatObject::show)
         .method("activateBindings", &PUICompatObject::activateBindings)
         .method("gridLocation", &PUICompatObject::gridLocation);
@@ -363,6 +365,51 @@ PUICompatObjectVec PUICompatObject::children() const
     return _children;
 }
 
+bool PUICompatObject::visible() const
+{
+    if (_visibleCondition) {
+        return _visibleCondition->test();
+    }
+
+    return _visible;
+}
+
+bool PUICompatObject::enabled() const
+{
+    if (_enableCondition) {
+        return _enableCondition->test();
+    }
+
+    return _enabled;
+}
+
+void PUICompatObject::setVisible(bool v)
+{
+    if (_visibleCondition) {
+        SG_LOG(SG_GUI, SG_DEV_ALERT, "Trying to set visiblity on widget with visible condition already defined");
+        return;
+    }
+
+    if (_visible == v)
+        return;
+
+    _visible = v;
+    callMethod<void, bool>("visibleChanged", _visible);
+}
+
+void PUICompatObject::setEnabled(bool e)
+{
+    if (_enableCondition) {
+        SG_LOG(SG_GUI, SG_DEV_ALERT, "Trying to set enabled on widget with enable condition already defined");
+        return;
+    }
+
+    if (_enabled == e)
+        return;
+
+    _enabled = e;
+    callMethod<void, bool>("enabledChanged", _enabled);
+}
 
 void PUICompatObject::recursiveUpdate(const std::string& objectName)
 {

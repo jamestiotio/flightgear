@@ -115,6 +115,9 @@ public:
 
     void close() override;
 
+    std::string title() const;
+    void setTitle(const std::string& s);
+
 private:
     friend naRef f_makeDialogPeer(const nasal::CallContext& ctx);
     friend naRef f_dialogRootObject(FGPUICompatDialog& dialog, naContext c);
@@ -168,42 +171,5 @@ private:
 
     std::string _name;
     PUICompatObjectRef _root;
-
-    // // PUI provides no way for userdata to be deleted automatically
-    // // with a GUI object, so we have to keep track of all the special
-    // // data we allocated and then free it manually when the dialog
-    // // closes.
-    // std::vector<void*> _info;
-    // struct PropertyObject {
-    //     PropertyObject(const char* name,
-    //                    puObject* object,
-    //                    SGPropertyNode_ptr node);
-    //     std::string name;
-    //     puObject* object;
-    //     SGPropertyNode_ptr node;
-    // };
-
-    // std::vector<PropertyObject*> _propertyObjects;
-    // std::vector<PropertyObject*> _liveObjects;
-
-    // class ConditionalObject : public SGConditional
-    // {
-    // public:
-    //     ConditionalObject(const std::string& aName, puObject* aPu) : _name(aName),
-    //                                                                  _pu(aPu)
-    //     {
-    //         ;
-    //     }
-
-    //     void update(FGPUIDialog* aDlg);
-
-    // private:
-    //     const std::string _name;
-    //     puObject* _pu;
-    // };
-
-    // typedef SGSharedPtr<ConditionalObject> ConditionalObjectRef;
-    // std::vector<ConditionalObjectRef> _conditionalObjects;
-
-    // std::vector<ActiveWidget*> _activeWidgets;
+    std::string _title;
 };

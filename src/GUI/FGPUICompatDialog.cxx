@@ -3,6 +3,7 @@
 // SPDX-FileCopyrightText: Copyright (C) 2022 James Turner
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+#include "GUI/dialog.hxx"
 #include "config.h"
 
 #include "FGPUICompatDialog.hxx"
@@ -73,18 +74,24 @@ naRef f_makeDialogPeer(const nasal::CallContext& ctx)
         new FGPUICompatDialog::DialogPeer(ctx.requireArg<naRef>(0))));
 }
 
+naRef f_dialogCanResize(FGPUICompatDialog& dialog, naContext c)
+{
+    return nasal::to_nasal(c, dialog.isFlagSet(FGDialog::WindowFlags::Resizable));
+}
 
 void FGPUICompatDialog::setupGhost(nasal::Hash& compatModule)
 {
     using NasalGUIDialog = nasal::Ghost<SGSharedPtr<FGPUICompatDialog>>;
     NasalGUIDialog::init("gui.xml.CompatDialog")
         .member("name", &FGPUICompatDialog::nameString)
+        .member("title", &FGPUICompatDialog::title, &FGPUICompatDialog::setTitle)
         .member("module", &f_dialogModuleHash)
         .member("geometry", &FGPUICompatDialog::geometry)
         .member("x", &FGPUICompatDialog::getX)
         .member("y", &FGPUICompatDialog::getY)
         .member("width", &FGPUICompatDialog::width)
         .member("height", &FGPUICompatDialog::height)
+        .member("resizeable", f_dialogCanResize)
         .member("root", f_dialogRootObject)
         .method("close", &FGPUICompatDialog::requestClose);
 
@@ -359,4 +366,18 @@ void FGPUICompatDialog::requestClose()
 {
     auto gui = globals->get_subsystem<NewGUI>();
     gui->closeDialog(_name);
+}
+
+std::string FGPUICompatDialog::title() const
+{
+    if (_title.empty())
+        return _name;
+
+    return _title;
+}
+
+void FGPUICompatDialog::setTitle(const std::string& s)
+{
+    _title = s;
+    _peer->callMethod<void>("titleChanged");
 }
