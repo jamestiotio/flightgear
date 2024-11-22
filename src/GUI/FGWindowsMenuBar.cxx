@@ -7,8 +7,6 @@
 #include "FGWindowsMenuBar.hxx"
 
 #include <windows.h>
-#include <atlbase.h>
-#include <atlconv.h>
 #include <cstring>
 
 #include <osgViewer/Viewer>
@@ -137,7 +135,8 @@ void FGWindowsMenuBar::init()
         bool enabled = menu->getBoolValue("enabled");
 
 		UINT flags = MF_POPUP;
-        AppendMenu(_p->menuBar, flags, (UINT_PTR)menuItems, CA2W(label.c_str(), CP_UTF8));
+        const auto wlabel = simgear::strutils::convertUtf8ToWString(label);
+        AppendMenu(_p->menuBar, flags, (UINT_PTR)menuItems, wlabel.c_str());
 
         // submenu
         int subMenuIndex = 0;
@@ -165,7 +164,8 @@ void FGWindowsMenuBar::init()
                 BOOL enabled = menuItem->getBoolValue("enabled");
 
 				UINT flags = MF_STRING;
-                AppendMenu(menuItems, flags, commandId, CA2W(label2.c_str(), CP_UTF8));
+                const auto wl2 = simgear::strutils::convertUtf8ToWString(label2);
+                AppendMenu(menuItems, flags, commandId, wl2.c_str());
             }
             subMenuIndex++;
         }
