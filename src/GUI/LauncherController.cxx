@@ -65,6 +65,8 @@
 #include "TipBackgroundBox.hxx"
 #include "GettingStartedScope.hxx"
 
+#include <flightgearBuildId.h>
+
 using namespace simgear::pkg;
 
 LauncherController::LauncherController(QObject *parent, QWindow* window) :
@@ -737,6 +739,14 @@ void LauncherController::queryMPServers()
 
 QString LauncherController::versionString() const
 {
+    if (strcmp(FG_BUILD_TYPE, "Nightly") == 0) {
+        return " Nightly " BUILD_DATE;
+    }
+
+    if (strcmp(FG_BUILD_TYPE, "Dev") == 0) {
+        return " (Dev)";
+    }
+
     return FLIGHTGEAR_VERSION;
 }
 

@@ -245,8 +245,7 @@ void fgSetDefaults ()
     v->setValueReadOnly("simgear", SG_STRINGIZE(SIMGEAR_VERSION));
     v->setValueReadOnly("openscenegraph", osgGetVersion());
     v->setValueReadOnly("revision", REVISION);
-    v->setValueReadOnly("build-number", JENKINS_BUILD_NUMBER);
-    v->setValueReadOnly("build-id", JENKINS_BUILD_ID);
+    v->setValueReadOnly("build-date", BUILD_DATE);
     v->setValueReadOnly("hla-support", bool(FG_HAVE_HLA));
     v->setValueReadOnly("build-type", FG_BUILD_TYPE);
 
@@ -3341,7 +3340,7 @@ void Options::showVersion() const
 {
     cout << "FlightGear version: " << FLIGHTGEAR_VERSION << endl;
     cout << "Revision: " << REVISION << endl;
-    cout << "Build-Id: " << JENKINS_BUILD_ID << endl;
+    cout << "Build-Date: " << BUILD_DATE << endl;
     cout << "Build-Type: " << FG_BUILD_TYPE << endl;
     cout << "FG_ROOT=" << globals->get_fg_root().utf8Str() << endl;
     cout << "FG_HOME=" << globals->get_fg_home().utf8Str() << endl;
@@ -3377,7 +3376,7 @@ void Options::printJSONReport() const
   cJSON_AddItemToObject(rootNode, "general", generalNode);
   cJSON_AddStringToObject(generalNode, "name", "FlightGear");
   cJSON_AddStringToObject(generalNode, "version", FLIGHTGEAR_VERSION);
-  cJSON_AddStringToObject(generalNode, "build ID", JENKINS_BUILD_ID);
+  cJSON_AddStringToObject(generalNode, "build date", BUILD_DATE);
   cJSON_AddStringToObject(generalNode, "build type", FG_BUILD_TYPE);
 
   cJSON *configNode = cJSON_CreateObject();

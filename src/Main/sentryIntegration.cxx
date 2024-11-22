@@ -269,13 +269,14 @@ void initSentry()
     sentry_options_set_dsn(options, SENTRY_API_KEY);
     
     if (strcmp(FG_BUILD_TYPE, "Dev") == 0) {
-        sentry_options_set_release(options, "flightgear-dev@" FLIGHTGEAR_VERSION);
+        sentry_options_set_release(options, "flightgear-dev@" REVISION);
+    } else if (strcmp(FG_BUILD_TYPE, "Nightly") == 0) {
+        sentry_options_set_release(options, "flightgear-nightly@" BUILD_DATE);
     } else {
         sentry_options_set_release(options, "flightgear@" FLIGHTGEAR_VERSION);
     }
-    
-    const auto buildString = std::to_string(JENKINS_BUILD_NUMBER);
-    sentry_options_set_dist(options, buildString.c_str());
+
+    sentry_options_set_dist(options, REVISION);
 
     // for dev / nightly builds, put Sentry in debug mode
     if (strcmp(FG_BUILD_TYPE, "Release")) {

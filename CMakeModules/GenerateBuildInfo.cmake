@@ -2,9 +2,7 @@
 set(BUILD_ID_DST_PATH "${CMAKE_BINARY_DIR}/src/Include/flightgearBuildId.h")
 
 if (FG_BUILD_TYPE STREQUAL "Dev")
-  # default values for all of these
-  set(JENKINS_BUILD_ID "none")
-  set(JENKINS_BUILD_NUMBER 0)
+  
   set(REVISION "none")
 
   # generate a placeholder buildId header
