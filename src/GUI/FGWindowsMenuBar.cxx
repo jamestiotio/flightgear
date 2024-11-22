@@ -136,7 +136,7 @@ void FGWindowsMenuBar::init()
 
 		UINT flags = MF_POPUP;
         const auto wlabel = simgear::strutils::convertUtf8ToWString(label);
-        AppendMenu(_p->menuBar, flags, (UINT_PTR)menuItems, wlabel.c_str());
+        AppendMenuW(_p->menuBar, flags, (UINT_PTR)menuItems, wlabel.c_str());
 
         // submenu
         int subMenuIndex = 0;
@@ -165,7 +165,7 @@ void FGWindowsMenuBar::init()
 
 				UINT flags = MF_STRING;
                 const auto wl2 = simgear::strutils::convertUtf8ToWString(label2);
-                AppendMenu(menuItems, flags, commandId, wl2.c_str());
+                AppendMenuW(menuItems, flags, commandId, wl2.c_str());
             }
             subMenuIndex++;
         }
