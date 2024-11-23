@@ -134,7 +134,7 @@ public:
         _groupNode(gnode),
         _cameraGroup(cg) {
         listenToNode("znear", 0.1f);
-        listenToNode("zfar", 120000.0f);
+        listenToNode("zfar", 1000000.0f);
     }
 
     virtual ~CameraGroupListener() {
