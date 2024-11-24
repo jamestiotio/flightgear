@@ -181,7 +181,7 @@ void PUICompatObject::init()
     auto nas = globals->get_subsystem<FGNasalSys>();
     callMethod<void>("init", nas->wrappedPropsNode(_config));
 
-    // recusively init children
+    // recursively init children
     for (auto c : _children) {
         c->init();
     }
