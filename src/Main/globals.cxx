@@ -215,10 +215,12 @@ FGGlobals::~FGGlobals()
 
     // don't cancel the pager until after shutdown, since AIModels (and
     // potentially others) can queue delete requests on the pager.
-    osgViewer::View* v = renderer->getView();
-    if (v && v->getDatabasePager()) {
-        v->getDatabasePager()->cancel();
-        v->getDatabasePager()->clear();
+    if (renderer) {
+        osgViewer::View* v = renderer->getView();
+        if (v && v->getDatabasePager()) {
+            v->getDatabasePager()->cancel();
+            v->getDatabasePager()->clear();
+        }
     }
 
     osgDB::Registry::instance()->clearObjectCache();
