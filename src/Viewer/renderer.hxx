@@ -97,7 +97,7 @@ public:
      */
     void removeCanvasCamera(osg::Camera* camera);
 
-    osgViewer::ViewerBase* getViewerBase();
+    osgViewer::ViewerBase* getViewerBase() const;
     
     /** Both should only be used on reset. */
     osg::ref_ptr<osgViewer::CompositeViewer> getCompositeViewer();

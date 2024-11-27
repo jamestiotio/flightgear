@@ -770,9 +770,9 @@ FGRenderer::removeCanvasCamera(osg::Camera* camera)
 }
 
 osgViewer::ViewerBase*
-FGRenderer::getViewerBase()
+FGRenderer::getViewerBase() const
 {
-    return _composite_viewer.get();
+    return _composite_viewer;
 }
 
 osg::ref_ptr<osgViewer::CompositeViewer>
