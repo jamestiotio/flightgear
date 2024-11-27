@@ -384,6 +384,7 @@ void fgOSInit(int* argc, char** argv)
     cocoaRegisterTerminateHandler();
 #endif
 
+    globals->set_renderer(new FGRenderer);
     globals->get_renderer()->init();
     WindowSystemAdapter::setWSA(new WindowSystemAdapter);
 }

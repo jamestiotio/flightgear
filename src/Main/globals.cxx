@@ -144,7 +144,6 @@ FGGlobals *globals = NULL;
 
 // Constructor
 FGGlobals::FGGlobals() :
-    renderer( new FGRenderer ),
     subsystem_mgr( new SGSubsystemMgr ),
     event_mgr( new SGEventMgr ),
     sim_time_sec( 0.0 ),
@@ -579,8 +578,9 @@ void FGGlobals::set_renderer(FGRenderer *render)
     if (render == renderer) {
         return;
     }
-
-    delete renderer;
+    if (renderer) {
+        delete renderer;
+    }
     renderer = render;
 }
 
