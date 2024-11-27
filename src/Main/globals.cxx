@@ -198,9 +198,8 @@ FGGlobals::~FGGlobals()
     // stop OSG threading first, to avoid thread races while we tear down
     // scene-graph pieces
     // there are some scenarios where renderer is already gone.
-    osg::ref_ptr<osgViewer::ViewerBase> vb;
     if (renderer) {
-        vb = renderer->getViewerBase();
+        osgViewer::ViewerBase* vb = renderer->getViewerBase();
         if (vb) {
             // https://code.google.com/p/flightgear-bugs/issues/detail?id=1291
             // explicitly stop trheading before we delete the renderer or
@@ -235,7 +234,6 @@ FGGlobals::~FGGlobals()
 
     delete subsystem_mgr;
     subsystem_mgr = nullptr; // important so ::get_subsystem returns NULL
-    vb = nullptr;
     set_matlib(NULL);
 
     delete time_params;
