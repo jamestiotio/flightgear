@@ -188,13 +188,13 @@ static void fgSetVideoOptions()
     SGPath autosaveFile = globals->autosaveFilePath(userDataPath);
     if (autosaveFile.exists()) return;
 
-    std::string vendor = fgGetString("/sim/rendering/gl-vendor");
+    std::string vendor = fgGetString("/sim/rendering/gl-info/gl-vendor");
     SGPath path(globals->get_fg_root());
     path.append("Video");
     path.append(vendor);
     if (path.exists())
     {
-        std::string renderer = fgGetString("/sim/rendering/gl-renderer");
+        std::string renderer = fgGetString("/sim/rendering/gl-info/gl-renderer");
         size_t pos = renderer.find("x86/");
         if (pos == std::string::npos) {
             pos = renderer.find('/');
@@ -221,9 +221,9 @@ static void fgSetVideoOptions()
 
 static void checkOpenGLVersion()
 {
-    flightgear::addSentryTag("gl-version", fgGetString("/sim/rendering/gl-version"));
-    flightgear::addSentryTag("gl-renderer", fgGetString("/sim/rendering/gl-vendor"));
-    flightgear::addSentryTag("gl-vendor", fgGetString("/sim/rendering/gl-renderer"));
+    flightgear::addSentryTag("gl-version", fgGetString("/sim/rendering/gl-info/gl-version"));
+    flightgear::addSentryTag("gl-renderer", fgGetString("/sim/rendering/gl-info/gl-vendor"));
+    flightgear::addSentryTag("gl-vendor", fgGetString("/sim/rendering/gl-info/gl-renderer"));
     
 #if defined(SG_MAC)
     // Mac users can't upgrade their drivers, so complaining about
@@ -233,7 +233,7 @@ static void checkOpenGLVersion()
 
     // format of these strings is not standardised, so be careful about
     // parsing them.
-    std::string versionString(fgGetString("/sim/rendering/gl-version"));
+    std::string versionString(fgGetString("/sim/rendering/gl-info/gl-version"));
     string_list parts = simgear::strutils::split(versionString);
     if (parts.size() == 3) {
         if (parts[1].find("NVIDIA") != std::string::npos) {

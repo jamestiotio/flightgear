@@ -70,40 +70,45 @@ using namespace flightgear;
 
 // Operation for querying OpenGL parameters. This must be done in a
 // valid OpenGL context, potentially in another thread.
-struct GeneralInitOperation : public GraphicsContextOperation {
-    GeneralInitOperation()
-        : GraphicsContextOperation(std::string("General init"))
+class QueryGLParametersOperation : public GraphicsContextOperation {
+public:
+    QueryGLParametersOperation() : GraphicsContextOperation(std::string("Query OpenGL Parameters"))
     {
     }
+
     void run(osg::GraphicsContext* gc)
     {
-        SGPropertyNode* simRendering = fgGetNode("/sim/rendering");
+        OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_mutex);
 
-        simRendering->setStringValue("gl-vendor", (char*)glGetString(GL_VENDOR));
-        SG_LOG(SG_GL, SG_INFO, glGetString(GL_VENDOR));
+        SGPropertyNode* p_rendering = fgGetNode("/sim/rendering/gl-info", true);
+        auto query_gl_string =
+            [p_rendering](const std::string& prop_name, GLenum name) {
+                const char* value = (const char*)glGetString(name);
+                // glGetString may return a null string
+                std::string str(value ? value : "");
+                p_rendering->setStringValue(prop_name, str);
+                SG_LOG(SG_GL, SG_INFO, "  " << prop_name << ": " << str);
+            };
 
-        simRendering->setStringValue("gl-renderer", (char*)glGetString(GL_RENDERER));
-        SG_LOG(SG_GL, SG_INFO, glGetString(GL_RENDERER));
+        auto query_gl_int =
+            [p_rendering](const std::string& prop_name, GLenum name) {
+                GLint value = 0;
+                glGetIntegerv(name, &value);
+                p_rendering->setIntValue(prop_name, value);
+                SG_LOG(SG_GL, SG_INFO, "  " << prop_name << ": " << value);
+            };
 
-        simRendering->setStringValue("gl-version", (char*)glGetString(GL_VERSION));
-        SG_LOG(SG_GL, SG_INFO, glGetString(GL_VERSION));
-
-        // Old hardware without support for OpenGL 2.0 does not support GLSL and
-        // glGetString returns NULL for GL_SHADING_LANGUAGE_VERSION.
-        //
-        // See https://forum.flightgear.org/viewtopic.php?f=17&t=19670&start=15#p181945
-        const char* glsl_version = (const char*)glGetString(GL_SHADING_LANGUAGE_VERSION);
-        simRendering->setStringValue("gl-shading-language-version",
-                                     glsl_version ? glsl_version : "UNSUPPORTED");
-        SG_LOG(SG_GL, SG_INFO, glsl_version);
-
-        GLint tmp;
-        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &tmp);
-        simRendering->setIntValue("max-texture-size", tmp);
-
-        glGetIntegerv(GL_MAX_TEXTURE_UNITS, &tmp);
-        simRendering->setIntValue("max-texture-units", tmp);
+        SG_LOG(SG_GL, SG_INFO, "OpenGL context info:");
+        query_gl_string("gl-vendor", GL_VENDOR);
+        query_gl_string("gl-renderer", GL_RENDERER);
+        query_gl_string("gl-version", GL_VERSION);
+        query_gl_string("gl-shading-language-version", GL_SHADING_LANGUAGE_VERSION);
+        query_gl_int("gl-max-texture-size", GL_MAX_TEXTURE_SIZE);
+        query_gl_int("gl-max-texture-units", GL_MAX_TEXTURE_UNITS);
     }
+
+private:
+    OpenThreads::Mutex _mutex;
 };
 
 class PointSpriteListener : public SGPropertyChangeListener {
@@ -439,7 +444,7 @@ FGRenderer::setupView()
 bool
 FGRenderer::runInitOperation()
 {
-    static osg::ref_ptr<GeneralInitOperation> genOp;
+    static osg::ref_ptr<QueryGLParametersOperation> genOp;
     static bool didInit = false;
 
     if (didInit) {
@@ -447,7 +452,7 @@ FGRenderer::runInitOperation()
     }
 
     if (!genOp.valid()) {
-        genOp = new GeneralInitOperation;
+        genOp = new QueryGLParametersOperation;
         WindowSystemAdapter* wsa = WindowSystemAdapter::getWSA();
         wsa->windows[0]->gc->add(genOp.get());
         return false; // not ready yet
@@ -476,7 +481,6 @@ FGRenderer::update()
                 if (gl2ext) {
                     _maximum_texture_size = gl2ext->maxTextureSize;
                     SGSceneFeatures::instance()->setMaxTextureSize(_maximum_texture_size);
-                    SG_LOG(SG_VIEW, SG_INFO, "FGRenderer:: Maximum texture size " << _maximum_texture_size);
                 }
             }
         }
