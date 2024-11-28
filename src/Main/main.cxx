@@ -740,8 +740,7 @@ int fgMainInit( int argc, char **argv )
     // Initialize sockets (WinSock needs this)
     simgear::Socket::initSockets();
 
-    // Clouds3D requires an alpha channel
-    fgOSOpenWindow(true /* request stencil buffer */);
+    fgOSOpenWindow();
     fgOSResetProperties();
 
     globals->get_renderer()->postinit();

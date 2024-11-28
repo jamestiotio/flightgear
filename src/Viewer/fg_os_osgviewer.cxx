@@ -101,7 +101,7 @@ void updateOSGNotifyLevel()
 {
 }
 
-void fgOSOpenWindow(bool stencil)
+void fgOSOpenWindow()
 {
     osg::setNotifyHandler(new SGNotifyHandler);
 
@@ -138,7 +138,7 @@ void fgOSOpenWindow(bool stencil)
         else
             viewer->setThreadingModel(osgViewer::Viewer::SingleThreaded);
 
-        WindowBuilder::initWindowBuilder(stencil);
+        WindowBuilder::initWindowBuilder();
         CameraGroup::buildDefaultGroup(view);
 
         FGEventHandler* manipulator = globals->get_renderer()->getEventHandler();
