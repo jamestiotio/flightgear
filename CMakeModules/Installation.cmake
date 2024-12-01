@@ -116,6 +116,9 @@ CONFIGURE_FILE(
     "${PROJECT_SOURCE_DIR}/CMakeModules/cmake_uninstall.cmake.in"
     "${PROJECT_BINARY_DIR}/cmake_uninstall.cmake"
     IMMEDIATE @ONLY)
-ADD_CUSTOM_TARGET(uninstall
-    "${CMAKE_COMMAND}" -P "${PROJECT_BINARY_DIR}/cmake_uninstall.cmake")
+
+if (NOT TARGET uninstall)
+    ADD_CUSTOM_TARGET(uninstall
+        "${CMAKE_COMMAND}" -P "${PROJECT_BINARY_DIR}/cmake_uninstall.cmake")
+endif()
 

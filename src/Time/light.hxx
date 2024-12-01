@@ -10,6 +10,7 @@
 #include <simgear/props/props.hxx>
 #include <simgear/structure/subsystem_mgr.hxx>
 #include <simgear/props/tiedpropertylist.hxx>
+#include <simgear/math/SGMath.hxx>
 
 // Define a structure containing the global lighting parameters
 class FGLight : public SGSubsystem {

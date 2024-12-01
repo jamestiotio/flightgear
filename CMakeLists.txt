@@ -367,7 +367,8 @@ if (ENABLE_QT)
     find_package(QT NAMES ${qtNames} COMPONENTS Core)
     if (QT_FOUND)
         if (${QT_VERSION_MAJOR} EQUAL "5")
-            set(minQtVersion 5.15.1)
+            # can't raise this until we update our AppImage build tooling
+            set(minQtVersion 5.12.1)
         endif()
 
         find_package(Qt${QT_VERSION_MAJOR} ${minQtVersion} REQUIRED COMPONENTS Widgets Gui Network Qml Quick Svg)
@@ -404,7 +405,21 @@ endif (ENABLE_QT)
 set(MIN_SIMGEAR_VERSION "${FLIGHTGEAR_MAJOR_VERSION}.${FLIGHTGEAR_MINOR_VERSION}.0")
 message(STATUS "Min Simgear version is ${MIN_SIMGEAR_VERSION}")
 
-find_package(SimGear ${MIN_SIMGEAR_VERSION} CONFIG REQUIRED)
+if (TARGET SimGearCore)
+    message(STATUS "Simgear targets exist, assuming superbuild")
+
+    # since we don't find(SimGear), we need to 
+    # find a few dependencies directly
+    if (SG_SOUND_USES_OPENALSOFT)
+        message((STATUS "Finding OpenAL"))
+        find_package(OpenAL CONFIG)
+    else()
+        find_package(OpenAL)
+    endif()
+
+else()
+    find_package(SimGear ${MIN_SIMGEAR_VERSION} CONFIG REQUIRED)
+endif()
 
 ##############################################################################
 
@@ -574,9 +589,9 @@ add_dependencies(fgfsObjects buildId)
 
 # remove once we use CMake 3.12, since then the dependency will be explicit
 add_dependencies(fgfsObjects fgembeddedresources)
-
+ 
 target_precompile_headers(fgfsObjects PRIVATE 
-        "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_SOURCE_DIR}/src/Include/flightgear_precompile.h>")
+        "$<$<COMPILE_LANGUAGE:CXX>:${PROJECT_SOURCE_DIR}/src/Include/flightgear_precompile.h>")
 
 ########################################################################
 
