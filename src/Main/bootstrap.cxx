@@ -389,7 +389,9 @@ int main ( int argc, char **argv )
 
 // do some clean up on exit.  Specifically we want to delete the sound-manager,
 // so OpenAL device and context are released cleanly
-void fgExitCleanup() {
+void fgExitCleanup() 
+{
+    flightgear::addSentryBreadcrumb("starting fgExitCleanup", "info");
 
     if (_bootstrap_OSInit != 0) {
         fgSetMouseCursor(MOUSE_CURSOR_POINTER);
@@ -405,6 +407,8 @@ void fgExitCleanup() {
     // on the common exit path globals is already deleted, and NULL,
     // so this only happens on error paths.
     delete globals;
+
+    flightgear::addSentryBreadcrumb("finished deleting globals", "info");
 
     simgear::shutdownLogging();
     flightgear::shutdownSentry();
