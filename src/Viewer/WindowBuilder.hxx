@@ -62,10 +62,13 @@ public:
 protected:
     WindowBuilder();
 
+    osg::GraphicsContext* attemptToCreateGraphicsContext(
+        const std::string& contextVersion, unsigned int profileMask) const;
+
     void setFullscreenTraits(const SGPropertyNode* winNode, osg::GraphicsContext::Traits* traits);
     bool setWindowedTraits(const SGPropertyNode* winNode, osg::GraphicsContext::Traits* traits);
     
-    void setMacPoseAsStandaloneApp(osg::GraphicsContext::Traits* traits);
+    void setMacPoseAsStandaloneApp(osg::GraphicsContext::Traits* traits) const;
     
     void makeDefaultTraits();
     

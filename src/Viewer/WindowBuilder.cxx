@@ -24,7 +24,6 @@
 #include <GUI/MessageBox.hxx>
 
 #include <sstream>
-#include <limits>
 
 #if defined(SG_MAC)
     #include <osgViewer/api/Cocoa/GraphicsWindowCocoa>
@@ -169,7 +168,19 @@ inline int setFromProperty(bool& place, const SGPropertyNode* node,
 
 namespace flightgear
 {
-    
+
+GraphicsContext* WindowBuilder::attemptToCreateGraphicsContext(
+    const std::string& contextVersion, unsigned int profileMask) const
+{
+    // We create the traits object locally here because it gets deleted if
+    // context creation is unsuccessful.
+    GraphicsContext::Traits* traits = new GraphicsContext::Traits(*defaultTraits);
+    setMacPoseAsStandaloneApp(traits);
+    traits->glContextVersion = contextVersion;
+    traits->glContextProfileMask = profileMask;
+    return GraphicsContext::createGraphicsContext(traits);
+}
+
 void WindowBuilder::setFullscreenTraits(const SGPropertyNode* winNode, GraphicsContext::Traits* traits)
 {
     const SGPropertyNode* orrNode = winNode->getNode("overrideRedirect");
@@ -210,7 +221,7 @@ bool WindowBuilder::setWindowedTraits(const SGPropertyNode* winNode, GraphicsCon
     return customTraits;
 }
     
-void WindowBuilder::setMacPoseAsStandaloneApp(GraphicsContext::Traits* traits)
+void WindowBuilder::setMacPoseAsStandaloneApp(GraphicsContext::Traits* traits) const
 {
 #if defined(SG_MAC)
     // this logic is unecessary if using a Qt window, since everything
@@ -301,12 +312,6 @@ GraphicsWindow* WindowBuilder::getDefaultWindow()
     if (defaultWindow)
         return defaultWindow;
 
-    // create if it, if necessary
-    GraphicsContext::Traits* traits = new GraphicsContext::Traits(*defaultTraits);
-    traits->windowName = "FlightGear";
-
-    setMacPoseAsStandaloneApp(traits);
-
     auto display_settings = osg::DisplaySettings::instance();
     GraphicsContext* gc = nullptr;
 
@@ -314,21 +319,15 @@ GraphicsWindow* WindowBuilder::getDefaultWindow()
     // Attempt to create an OpenGL 4.3 core profile context first if we are not
     // on MacOS (max version there is 4.1). We can optionally take advantage of
     // 4.3 features like compute shaders.
-    traits->glContextVersion = "4.3";
-    traits->glContextProfileMask = 0x1;
     display_settings->setValue("FG_GLSL_VERSION", "#version 430 core");
-
-    gc = GraphicsContext::createGraphicsContext(traits);
+    gc = attemptToCreateGraphicsContext("4.3", 0x1);
 #endif
 
     if (!gc) {
         // 4.3 is unsupported, so try with 4.1. This version is required, i.e.
         // we crash if we can't successfully create an OpenGL context.
-        traits->glContextVersion = "4.1";
-        traits->glContextProfileMask = 0x1;
         display_settings->setValue("FG_GLSL_VERSION", "#version 410 core");
-
-        gc = GraphicsContext::createGraphicsContext(traits);
+        gc = attemptToCreateGraphicsContext("4.1", 0x1);
         if (!gc) {
             flightgear::fatalMessageBoxThenExit(
                 "Unable to create OpenGL 4.1 core profile context",
@@ -341,8 +340,8 @@ GraphicsWindow* WindowBuilder::getDefaultWindow()
 
     // Copy the winning OpenGL version to the default traits so subsequent
     // windows can use it.
-    defaultTraits->glContextVersion = traits->glContextVersion;
-    defaultTraits->glContextProfileMask = traits->glContextProfileMask;
+    defaultTraits->glContextVersion = gc->getTraits()->glContextVersion;
+    defaultTraits->glContextProfileMask = gc->getTraits()->glContextProfileMask;
 
     defaultWindow = WindowSystemAdapter::getWSA()->registerWindow(gc, defaultWindowName);
     return defaultWindow;
