@@ -846,7 +846,7 @@ computeCameraIntersection(const CameraGroup *cgroup,
     osgUtil::IntersectionVisitor iv(picker);
     iv.setTraversalMask(simgear::PICK_BIT);
 
-    const_cast<CameraGroup *>(cgroup)->getView()->getCamera()->accept(iv);
+    const_cast<CameraGroup*>(cgroup)->getView()->getSceneData()->accept(iv);
     if (picker->containsIntersections()) {
         intersections = picker->getIntersections();
         return true;
@@ -859,14 +859,10 @@ bool computeIntersections(const CameraGroup* cgroup,
                           const osg::Vec2d& windowPos,
                           osgUtil::LineSegmentIntersector::Intersections& intersections)
 {
-    // test the GUI first
-    CameraInfo* guiCamera = cgroup->getGUICamera();
-    if (guiCamera && computeCameraIntersection(cgroup, guiCamera, windowPos, intersections))
-        return true;
-
     // Find camera that contains event
     for (const auto &cinfo : cgroup->_cameras) {
-        if (cinfo == guiCamera)
+        // Skip the splash and GUI cameras
+        if (cinfo->flags & (CameraInfo::SPLASH | CameraInfo::GUI))
             continue;
 
         if (computeCameraIntersection(cgroup, cinfo, windowPos, intersections))
