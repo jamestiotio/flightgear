@@ -2687,9 +2687,11 @@ void Options::processArgResult(int result)
 
 void Options::readConfig(const SGPath& path)
 {
-  sg_gzifstream in( path );
-  if ( !in.is_open() ) {
-    return;
+    using namespace simgear;
+
+    sg_gzifstream in(path);
+    if (!in.is_open()) {
+        return;
   }
 
   SG_LOG( SG_GENERAL, SG_INFO, "Processing config file: " << path );
@@ -2699,7 +2701,7 @@ void Options::readConfig(const SGPath& path)
     string line;
     getline( in, line, '\n' );
 
-    simgear::strutils::stripTrailingNewlines_inplace(line);
+    line = strutils::strip(line);
 
     // avoid processing empty lines
     // https://sourceforge.net/p/flightgear/codetickets/2927/
@@ -2715,7 +2717,7 @@ void Options::readConfig(const SGPath& path)
       // We assume that the value is separated by a space from the option name, like:
       // --metar XXXX 280900Z 28007KT 9999 20/16 Q1010 instead of
       // --metar=XXXX 280900Z 28007KT 9999 20/16 Q1010
-      value = line.substr(space + 1);
+      value = strutils::strip(line.substr(space + 1));
       line = line.substr(0, space);
     }
 
