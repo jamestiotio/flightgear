@@ -156,15 +156,15 @@ Item {
                                 _addOns.modulePaths = modifiedPaths;
                             }
 
-                            onPerformMove: {
+                            onPerformMove: function(newIndex) {
                                 var modifiedPaths = _addOns.modulePaths.slice()
                                 modifiedPaths.splice(model.index, 1);
                                 modifiedPaths.splice(newIndex, 0, model.path)
                                 _addOns.modulePaths = modifiedPaths;
                             }
 
-                            onShowDetails: {
-                                flick.showDetails(detailIndex)
+                            onShowDetails: function(detailIndex) {
+                                root.showDetails(detailIndex);
                             }
                         }
                     }

@@ -177,6 +177,8 @@ if (HAVE_QT)
                         QmlPropertyModel.cxx
                         QmlPositioned.hxx
                         QmlPositioned.cxx
+                        QmlPositionedModel.cxx
+                        QmlPositionedModel.hxx
                         QmlNavCacheWrapper.hxx
                         QmlNavCacheWrapper.cxx
                         QmlRadioButtonHelper.cxx
@@ -211,6 +213,8 @@ if (HAVE_QT)
                         GettingStartedScope.cxx
                         QmlColoredImageProvider.hxx
                         QmlColoredImageProvider.cxx
+                        QmlStringListModel.hxx
+                        QmlStringListModel.cxx
                         )
 
     set_property(TARGET fgqmlui PROPERTY AUTOMOC ON)
