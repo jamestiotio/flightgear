@@ -42,12 +42,6 @@ foreach (osglib OSG OpenThreads osgUtil osgText osgGA osgSim osgParticle osgTerr
                 $<TARGET_BUNDLE_CONTENT_DIR:fgfs>/Frameworks
         )
     endif()
-
-    if (LINUX)
-        install(FILES $<TARGET_FILE:OSG::${osglib}>  
-            DESTINATION appdir/usr/lib
-            COMPONENT packaging EXCLUDE_FROM_ALL)
-    endif()
 endforeach()
 
 if (APPLE)
@@ -87,9 +81,6 @@ endif()
 
 if (LINUX)
     
-    install(DIRECTORY ${OSG_PLUGINS_DIR} 
-        DESTINATION appdir/usr/lib 
-        COMPONENT packaging EXCLUDE_FROM_ALL)
     install(TARGETS fgcom fgjs fgelev fgfs 
         DESTINATION appdir/usr/bin 
         COMPONENT packaging EXCLUDE_FROM_ALL)
