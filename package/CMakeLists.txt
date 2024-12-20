@@ -17,7 +17,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     )
 
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.flightgear.FlightGear.desktop" 
-    DESTINATION share/applications)
+        DESTINATION share/applications)
 
     # generate a metainfo file corresponding to this release
     configure_file (
@@ -27,4 +27,14 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/org.flightgear.FlightGear.metainfo.xml" DESTINATION share/metainfo)
 
+
+# seperate install rules for AppDir creation
+    install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/org.flightgear.FlightGear.desktop" 
+        DESTINATION usr/share/applications
+        COMPONENT packaging)
+    install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/org.flightgear.FlightGear.metainfo.xml" 
+        DESTINATION usr/share/metainfo
+        COMPONENT packaging)
 endif()
