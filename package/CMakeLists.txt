@@ -31,10 +31,10 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 # seperate install rules for AppDir creation
     install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/org.flightgear.FlightGear.desktop" 
-        DESTINATION usr/share/applications
+        DESTINATION appdir/usr/share/applications
         COMPONENT packaging)
     install(FILES
         "${CMAKE_CURRENT_BINARY_DIR}/org.flightgear.FlightGear.metainfo.xml" 
-        DESTINATION usr/share/metainfo
+        DESTINATION appdir/usr/share/metainfo
         COMPONENT packaging)
 endif()
