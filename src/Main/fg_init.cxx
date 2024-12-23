@@ -1343,7 +1343,6 @@ void fgStartNewReset()
     flightgear::unregisterMainLoopProperties();
     FGReplay::resetStatisticsProperties();
 
-    simgear::clearSharedTreeGeometry();
     simgear::clearEffectCache();
     simgear::VPBTechnique::clearConstraints();
     simgear::SGModelLib::resetPropertyRoot();
