@@ -199,7 +199,7 @@ bool PUICompatObject::isNodeAChildObject(const std::string& nm)
 {
     const string_list typeNames = {
         "button", "one-shot", "slider", "dial",
-        "text", "input",
+        "text", "input", "radio",
         "combo", "textbox", "select",
         "hrule", "vrule", "group", "frame",
         "checkbox"};
