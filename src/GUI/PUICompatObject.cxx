@@ -60,6 +60,7 @@ void PUICompatObject::setupGhost(nasal::Hash& compatModule)
         .member("parent", &PUICompatObject::parent)
         .member("visible", &PUICompatObject::visible, &PUICompatObject::setVisible)
         .member("enabled", &PUICompatObject::enabled, &PUICompatObject::setEnabled)
+        .member("type", &PUICompatObject::type)
         .method("show", &PUICompatObject::show)
         .method("activateBindings", &PUICompatObject::activateBindings)
         .method("gridLocation", &PUICompatObject::gridLocation);
@@ -381,6 +382,11 @@ bool PUICompatObject::enabled() const
     }
 
     return _enabled;
+}
+
+std::string PUICompatObject::type() const
+{
+    return _type;
 }
 
 void PUICompatObject::setVisible(bool v)
