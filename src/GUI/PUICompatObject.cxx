@@ -464,6 +464,6 @@ nasal::Hash PUICompatObject::gridLocation(const nasal::CallContext& ctx) const
     result.set("column", _config->getIntValue("col"));
     result.set("row", _config->getIntValue("row"));
     result.set("columnSpan", _config->getIntValue("colspan", 1));
-    result.set("rowSpan", _config->getIntValue("rowpsan", 1));
+    result.set("rowSpan", _config->getIntValue("rowspan", 1));
     return result;
 }
