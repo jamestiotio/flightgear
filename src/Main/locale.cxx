@@ -225,17 +225,17 @@ bool FGLocale::selectLanguage(const std::string& language)
 
         if (_currentLocale) {
             SG_LOG(SG_GENERAL, SG_DEBUG,
-                   "Found locale for '" << lang << "' at '" <<
-                   _currentLocale->getPath() << "'");
+                   "Found locale for '" << lang << "' at " <<
+                   _currentLocale->getPath());
             break;
         }
     }
 
-    if (_currentLocale && _currentLocale->hasChild("xliff")) {
+    if (_currentLocale &&
+       _currentLocale->getNode("core", 0, true)->hasChild("xliff")) {
         parseXLIFF(_currentLocale);
     }
-   
-    
+
     // load resource for system messages (translations for fgfs internal messages)
     loadResource("sys");
     loadResource("atc");
@@ -259,8 +259,10 @@ void FGLocale::clear()
     _languages.clear();
 
     if (_currentLocale && (_currentLocale != _defaultLocale)) {
-        // remove loaded strings, so we don't duplicate
-        _currentLocale->removeChild("strings");
+        // Remove loaded strings, so we don't duplicate them
+        if (_currentLocale->hasChild("core")) {
+            _currentLocale->getNode("core", 0)->removeChild("strings");
+        }
     }
 
     _currentLocale.clear();
@@ -276,21 +278,23 @@ FGLocale::getPreferredLanguage() const
 
 void FGLocale::parseXLIFF(SGPropertyNode* localeNode)
 {
-    SGPath path(globals->get_fg_root());
-    SGPath xliffPath = path / localeNode->getStringValue("xliff");
+    SGPropertyNode* coreNode = localeNode->getNode("core", 0, true);
+    const string relPath = coreNode->getStringValue("xliff");
+    const SGPath xliffPath = globals->get_fg_root() / relPath;
+
     if (!xliffPath.exists()) {
         SG_LOG(SG_GENERAL, SG_ALERT, "No XLIFF file at " << xliffPath);
     } else {
         SG_LOG(SG_GENERAL, SG_INFO, "Loading XLIFF file at " << xliffPath);
-        SGPropertyNode_ptr stringNode = localeNode->getNode("strings", 0, true);
+        SGPropertyNode_ptr stringsNode = coreNode->getNode("strings", 0, true);
         try {
-            flightgear::XLIFFParser visitor(stringNode);
+            flightgear::XLIFFParser visitor(stringsNode);
             readXML(xliffPath, visitor);
         } catch (sg_io_exception& ex) {
-            SG_LOG(SG_GENERAL, SG_WARN, "failure parsing XLIFF: " << path <<
+            SG_LOG(SG_GENERAL, SG_WARN, "failure parsing XLIFF: " << xliffPath <<
                    "\n\t" << ex.getMessage() << "\n\tat:" << ex.getLocation().asString());
         } catch (sg_exception& ex) {
-            SG_LOG(SG_GENERAL, SG_WARN, "failure parsing XLIFF: " << path <<
+            SG_LOG(SG_GENERAL, SG_WARN, "failure parsing XLIFF: " << xliffPath <<
                    "\n\t" << ex.getMessage());
         }
     }
@@ -302,13 +306,14 @@ bool
 FGLocale::loadResource(SGPropertyNode* localeNode, const char* resource)
 {
     SGPath path( globals->get_fg_root() );
+    SGPropertyNode* coreNode = localeNode->getNode("core", 0, true);
 
     // already loaded
-    if (localeNode->hasChild("xliff")) {
+    if (coreNode->hasChild("xliff")) {
         return true;
     }
-    
-    SGPropertyNode* stringNode = localeNode->getNode("strings", 0, true);
+
+    SGPropertyNode* stringNode = coreNode->getNode("strings", 0, true);
     SGPropertyNode* resourceNode = stringNode->getNode(resource);
 
     if (!resourceNode)
@@ -367,7 +372,9 @@ FGLocale::loadResource(const char* resource)
 std::string
 FGLocale::innerGetLocalizedString(SGPropertyNode* localeNode, const char* id, const char* context, int index) const
 {
-    SGPropertyNode *n = localeNode->getNode("strings",0, true)->getNode(context);
+    SGPropertyNode* n = localeNode->getNode("core", 0, true)
+                            ->getNode("strings", 0, true)
+                            ->getNode(context);
     if (!n) {
         return std::string();
     }
@@ -438,9 +445,10 @@ FGLocale::getLocalizedStringWithIndex(const char* id, const char* resource, unsi
 simgear::PropertyList
 FGLocale::getLocalizedStrings(SGPropertyNode *localeNode, const char* id, const char* context)
 {
-    SGPropertyNode *n = localeNode->getNode("strings",0, true)->getNode(context);
-    if (n)
-    {
+    SGPropertyNode* n = localeNode->getNode("core", 0, true)
+                            ->getNode("strings", 0, true)
+                            ->getNode(context);
+    if (n) {
         return n->getChildren(id);
     }
     return simgear::PropertyList();
@@ -450,7 +458,9 @@ size_t FGLocale::getLocalizedStringCount(const char* id, const char* resource) c
 {
     assert(_inited);
     if (_currentLocale) {
-        SGPropertyNode* resourceNode = _currentLocale->getNode("strings",0, true)->getNode(resource);
+        SGPropertyNode* resourceNode = _currentLocale->getNode("core", 0, true)
+                                           ->getNode("strings", 0, true)
+                                           ->getNode(resource);
         if (resourceNode) {
             const size_t count = resourceNode->getChildren(id).size();
             if (count > 0) {
@@ -460,7 +470,9 @@ size_t FGLocale::getLocalizedStringCount(const char* id, const char* resource) c
     }
 
     if (_defaultLocale) {
-        auto resourceNode = _defaultLocale->getNode("strings", 0, true)->getNode(resource);
+        SGPropertyNode* resourceNode = _defaultLocale->getNode("core", 0, true)
+                                           ->getNode("strings", 0, true)
+                                           ->getNode(resource);
         if (!resourceNode)
             return 0;
 
