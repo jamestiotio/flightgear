@@ -236,11 +236,13 @@ bool FGLocale::selectLanguage(const std::string& language)
         parseXLIFF(_currentLocale);
     }
 
-    // load resource for system messages (translations for fgfs internal messages)
-    loadResource("sys");
-    loadResource("atc");
-    loadResource("tips");
-    loadResource("weather-scenarios");
+    // Load the default translation
+    loadResourceForDefaultTranslation("atc");
+    loadResourceForDefaultTranslation("menu");
+    loadResourceForDefaultTranslation("options");
+    loadResourceForDefaultTranslation("sys");
+    loadResourceForDefaultTranslation("tips");
+    loadResourceForDefaultTranslation("weather-scenarios");
 
     _inited = true;
     if (!_currentLocale && !_currentLocaleString.empty()) {
@@ -300,19 +302,13 @@ void FGLocale::parseXLIFF(SGPropertyNode* localeNode)
     }
 }
 
-// Load strings for requested resource and locale.
-// Result is stored below "strings" in the property tree of the given locale.
+// Load the default translation of the requested resource.
+// Result is stored below "strings" in the property tree of the default locale.
 bool
-FGLocale::loadResource(SGPropertyNode* localeNode, const char* resource)
+FGLocale::loadResourceForDefaultTranslation(const std::string& resource)
 {
     SGPath path( globals->get_fg_root() );
-    SGPropertyNode* coreNode = localeNode->getNode("core", 0, true);
-
-    // already loaded
-    if (coreNode->hasChild("xliff")) {
-        return true;
-    }
-
+    SGPropertyNode* coreNode = _defaultLocale->getNode("core", 0, true);
     SGPropertyNode* stringNode = coreNode->getNode("strings", 0, true);
     SGPropertyNode* resourceNode = stringNode->getNode(resource);
 
@@ -333,7 +329,7 @@ FGLocale::loadResource(SGPropertyNode* localeNode, const char* resource)
 
     path.append(path_str);
     SG_LOG(SG_GENERAL, SG_INFO, "Reading localized strings for '" <<
-           localeNode->getStringValue("lang", "<none>")
+           _defaultLocale->getStringValue("lang", "<none>")
            <<"' from " << path);
 
     // load the actual file
@@ -350,23 +346,6 @@ FGLocale::loadResource(SGPropertyNode* localeNode, const char* resource)
     // set marker to indicate the data has been loaded
     resourceNode->setBoolValue("__loaded", true);
     return true;
-}
-
-// Load strings for requested resource (for current and default locale).
-// Result is stored below "strings" in the property tree of the locales.
-bool
-FGLocale::loadResource(const char* resource)
-{
-    // load defaults first
-    bool Ok = loadResource(_defaultLocale, resource);
-
-    // also load language specific resource, unless identical
-    if ((_currentLocale != nullptr) && (_defaultLocale != _currentLocale))
-    {
-        Ok &= loadResource(_currentLocale, resource);
-    }
-
-    return Ok;
 }
 
 std::string

@@ -59,14 +59,6 @@ public:
     std::string getPreferredLanguage() const;
 
     /**
-     * Load strings for requested resource, i.e. "menu", "options", "dialogs".
-     * Loads data for current and default locale (the latter is the fallback).
-     * Result is stored below the "strings" node in the property tree of the
-     * respective locale.
-     */
-    bool        loadResource        (const char* resource);
-
-    /**
      * Obtain a single string from the localized resource matching the given identifier.
      * Selected context refers to "menu", "options", "dialog" etc.
      */
@@ -131,9 +123,12 @@ protected:
     SGPropertyNode* findLocaleNode      (const std::string& language);
 
     /**
-     * Load resource data for given locale node.
+     * Load default strings for the requested resource ("atc", "menu",  etc.).
+     *
+     * Result is stored below the "strings" node in the property tree of the
+     * default locale.
      */
-    bool            loadResource        (SGPropertyNode* localeNode, const char* resource);
+    bool loadResourceForDefaultTranslation(const std::string& resource);
 
     /**
      * Obtain a single string from locale node matching the given identifier and context.
