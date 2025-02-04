@@ -42,6 +42,7 @@ It is impossible to keep an accurate record of all contributors, and this list i
 - Thomas Forster
 - Melchior Franz
 - Jean-loup Gailly
+- Fernando García Liñán
 - Mark Adler
 - Thomas Gellekum
 - Ralf Gerlich
