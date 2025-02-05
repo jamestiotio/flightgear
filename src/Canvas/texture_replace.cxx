@@ -128,7 +128,7 @@ class ReplaceStaticTextureVisitor : public osg::NodeVisitor
       //  1. PBR Effect: $FG_ROOT/Effects/model-pbr.eff
       //  2. glTF loader: simgear/scene/model/ReaderWriterGLTF.cxx
       //  3. PBR animations: simgear/scene/model/SGPBRAnimation.cxx
-      //  4. Canvas ODGauge: flightgear/src/Canvas/od_gauge.cxx
+      //  4. Canvas: flightgear/src/Canvas/texture_replace.cxx
       unsigned int unit = 0;
       if (_tex_name.empty() || _tex_name == "base-color") unit = 0;
       else if (_tex_name == "normalmap")                  unit = 1;
