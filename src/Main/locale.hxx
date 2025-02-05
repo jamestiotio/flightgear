@@ -128,7 +128,10 @@ protected:
      * Result is stored below the "strings" node in the property tree of the
      * default locale.
      */
-    bool loadResourceForDefaultTranslation(const std::string& resource);
+    bool loadResourceForDefaultTranslation(
+        const SGPath& basePath, const std::string& domain,
+        const std::string& resource);
+    void loadCoreResourcesForDefaultTranslation();
 
     /**
      * Obtain a single string from locale node matching the given identifier and context.

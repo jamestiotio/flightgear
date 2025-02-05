@@ -236,13 +236,8 @@ bool FGLocale::selectLanguage(const std::string& language)
         parseXLIFF(_currentLocale);
     }
 
-    // Load the default translation
-    loadResourceForDefaultTranslation("atc");
-    loadResourceForDefaultTranslation("menu");
-    loadResourceForDefaultTranslation("options");
-    loadResourceForDefaultTranslation("sys");
-    loadResourceForDefaultTranslation("tips");
-    loadResourceForDefaultTranslation("weather-scenarios");
+    // Default translation for 'atc', 'menu', 'options', etc.
+    loadCoreResourcesForDefaultTranslation();
 
     _inited = true;
     if (!_currentLocale && !_currentLocaleString.empty()) {
@@ -252,6 +247,15 @@ bool FGLocale::selectLanguage(const std::string& language)
     }
 
     return true;
+}
+
+void FGLocale::loadCoreResourcesForDefaultTranslation()
+{
+    const SGPath path = globals->get_fg_root();
+    for (const string resource : {
+             "atc", "menu", "options", "sys", "tips", "weather-scenarios"}) {
+        loadResourceForDefaultTranslation(path, "core", resource);
+    }
 }
 
 void FGLocale::clear()
@@ -304,41 +308,41 @@ void FGLocale::parseXLIFF(SGPropertyNode* localeNode)
 
 // Load the default translation of the requested resource.
 // Result is stored below "strings" in the property tree of the default locale.
-bool
-FGLocale::loadResourceForDefaultTranslation(const std::string& resource)
+bool FGLocale::loadResourceForDefaultTranslation(
+    const SGPath& basePath, const std::string& domain,
+    const std::string& resource)
 {
-    SGPath path( globals->get_fg_root() );
-    SGPropertyNode* coreNode = _defaultLocale->getNode("core", 0, true);
-    SGPropertyNode* stringNode = coreNode->getNode("strings", 0, true);
-    SGPropertyNode* resourceNode = stringNode->getNode(resource);
+    SGPropertyNode* stringsNode = _defaultLocale->getNode(domain, 0, true)
+                                                ->getNode("strings", 0, true);
+    SGPropertyNode* resourceNode = stringsNode->getNode(resource);
 
-    if (!resourceNode)
+    if (!resourceNode) {
         return false;
-
-    if (resourceNode->getBoolValue("__loaded")) {
+    } else if (resourceNode->getBoolValue("__loaded")) {
         // already loaded previously
         return true;
     }
 
-    string path_str = resourceNode->getStringValue();
-    if (path_str.empty())
-    {
-        SG_LOG(SG_GENERAL, SG_WARN, "No path in " << stringNode->getPath() << "/" << resource << ".");
+    const string path_str = resourceNode->getStringValue();
+    if (path_str.empty()) {
+        SG_LOG(SG_GENERAL, SG_WARN, "No path in " << stringsNode->getPath()
+               << " for resource '" << resource << "' in domain '"
+               << domain << "'.");
         return false;
     }
 
-    path.append(path_str);
-    SG_LOG(SG_GENERAL, SG_INFO, "Reading localized strings for '" <<
-           _defaultLocale->getStringValue("lang", "<none>")
+    const SGPath path = basePath / path_str;
+    SG_LOG(SG_GENERAL, SG_INFO, "Reading localized strings for " <<
+           domain << "/" << resource << " in language '"
+           << _defaultLocale->getStringValue("lang", "<none>")
            <<"' from " << path);
 
     // load the actual file
-    try
-    {
+    try {
         readProperties(path, resourceNode);
-    } catch (const sg_exception &e)
-    {
-        SG_LOG(SG_GENERAL, SG_ALERT, "Unable to read the localized strings from " << path <<
+    } catch (const sg_exception &e) {
+        SG_LOG(SG_GENERAL, SG_ALERT,
+               "Unable to read the localized strings from " << path <<
                ". Error: " << e.getFormattedMessage());
         return false;
     }
