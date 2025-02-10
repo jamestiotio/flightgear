@@ -30,6 +30,8 @@
 #include <cassert>
 
 #include <simgear/misc/strutils.hxx>
+#include <simgear/misc/sg_dir.hxx>
+#include <simgear/misc/sg_path.hxx>
 #include <simgear/props/props.hxx>
 #include <simgear/props/props_io.hxx>
 #include <simgear/structure/exception.hxx>
@@ -38,11 +40,13 @@
 #include "locale.hxx"
 #include "XLIFFParser.hxx"
 
+#include <Add-ons/AddonManager.hxx>
 #include <Add-ons/AddonMetadataParser.hxx>
 
-using std::vector;
 using std::string;
+using std::vector;
 namespace strutils = simgear::strutils;
+using flightgear::addons::Addon;
 
 FGLocale::FGLocale(SGPropertyNode* root) :
 	_intl(root->getNode("/sim/intl", 0, true)),
@@ -233,7 +237,7 @@ bool FGLocale::selectLanguage(const std::string& language)
 
     if (_currentLocale &&
        _currentLocale->getNode("core", 0, true)->hasChild("xliff")) {
-        parseXLIFF(_currentLocale);
+        loadXLIFF(globals->get_fg_root(), _currentLocale, "core");
     }
 
     // Default translation for 'atc', 'menu', 'options', etc.
@@ -251,10 +255,87 @@ bool FGLocale::selectLanguage(const std::string& language)
 
 void FGLocale::loadCoreResourcesForDefaultTranslation()
 {
-    const SGPath path = globals->get_fg_root();
     for (const string resource : {
              "atc", "menu", "options", "sys", "tips", "weather-scenarios"}) {
-        loadResourceForDefaultTranslation(path, "core", resource);
+        loadResourceForDefaultTranslation_indirect(
+            globals->get_fg_root(), "core", resource);
+    }
+}
+
+void FGLocale::loadAircraftTranslations()
+{
+    loadResourcesFromAircraftOrAddonDir(fgGetString("/sim/aircraft-dir"),
+                                        "aircraft");
+}
+
+void FGLocale::loadAddonTranslations()
+{
+    const auto& addonManager = flightgear::addons::AddonManager::instance();
+    if (addonManager) {
+        for (const Addon* addon : addonManager->registeredAddons()) {
+            const string domain = "addons/" + addon->getId();
+            loadResourcesFromAircraftOrAddonDir(addon->getBasePath(), domain);
+        }
+    } else {
+        SG_LOG(SG_GENERAL, SG_WARN,
+               "FGLocale: not loading add-on translations: AddonManager "
+               "instance not found");
+    }
+}
+
+void FGLocale::loadResourcesFromAircraftOrAddonDir(const SGPath& basePath,
+                                                   const string& domain)
+{
+    const simgear::Dir d = simgear::Dir(basePath / "Translations" / "default");
+
+    if (d.exists()) {
+        loadDefaultTranslationFromAircraftOrAddonDir(d, domain);
+    }
+
+    loadXLIFFFromAircraftOrAddonDir(basePath, domain);
+}
+
+void FGLocale::loadDefaultTranslationFromAircraftOrAddonDir(
+    const simgear::Dir& defaultTranslationDir, const string& domain)
+{
+    const auto xmlFiles = defaultTranslationDir.children(
+        simgear::Dir::TYPE_FILE | simgear::Dir::NO_DOT_OR_DOTDOT, ".xml");
+
+    for (const SGPath& file : xmlFiles) {
+        loadResourceForDefaultTranslation(file, domain, file.file_base());
+    }
+}
+
+void FGLocale::loadXLIFFFromAircraftOrAddonDir(const SGPath& basePath,
+                                               const string& domain)
+{
+    const simgear::Dir translDir = simgear::Dir(basePath / "Translations");
+    if (!translDir.exists()) {
+        return;
+    }
+
+    const auto subdirs = translDir.children(
+        simgear::Dir::TYPE_DIR | simgear::Dir::NO_DOT_OR_DOTDOT);
+    const auto langNodes = _currentLocale->getChildren("lang");
+
+    for (const SGPath& subdir : subdirs) {
+        const string name = subdir.file(); // name of subdir of 'Translations'
+        if (name == "default") {
+            continue;
+        }
+
+        for (const auto& n : langNodes) {
+            if (n->getStringValue() != name) {
+                continue;
+            }
+
+            // Subdir 'name' matches the current locale, try to load XLIFF
+            SGPropertyNode* xliffNode = _currentLocale->getNode(
+                domain + "/xliff", 0, true);
+            xliffNode->setStringValue(
+                "Translations/"  + name + "/FlightGear-nonQt.xlf");
+            loadXLIFF(basePath, _currentLocale, domain);
+        }
     }
 }
 
@@ -282,17 +363,18 @@ FGLocale::getPreferredLanguage() const
     return _currentLocaleString;
 }
 
-void FGLocale::parseXLIFF(SGPropertyNode* localeNode)
+void FGLocale::loadXLIFF(const SGPath& basePath, SGPropertyNode* localeNode,
+                         const string& domain)
 {
-    SGPropertyNode* coreNode = localeNode->getNode("core", 0, true);
-    const string relPath = coreNode->getStringValue("xliff");
-    const SGPath xliffPath = globals->get_fg_root() / relPath;
+    SGPropertyNode* domainNode = localeNode->getNode(domain, 0, true);
+    const string relPath = domainNode->getStringValue("xliff");
+    const SGPath xliffPath = basePath / relPath;
 
     if (!xliffPath.exists()) {
         SG_LOG(SG_GENERAL, SG_ALERT, "No XLIFF file at " << xliffPath);
     } else {
         SG_LOG(SG_GENERAL, SG_INFO, "Loading XLIFF file at " << xliffPath);
-        SGPropertyNode_ptr stringsNode = coreNode->getNode("strings", 0, true);
+        SGPropertyNode_ptr stringsNode = domainNode->getNode("strings", 0, true);
         try {
             flightgear::XLIFFParser visitor(stringsNode);
             readXML(xliffPath, visitor);
@@ -307,42 +389,50 @@ void FGLocale::parseXLIFF(SGPropertyNode* localeNode)
 }
 
 // Load the default translation of the requested resource.
-// Result is stored below "strings" in the property tree of the default locale.
-bool FGLocale::loadResourceForDefaultTranslation(
-    const SGPath& basePath, const std::string& domain,
-    const std::string& resource)
+// This function gets the resource relative path from the Property Tree.
+bool FGLocale::loadResourceForDefaultTranslation_indirect(
+    const SGPath& basePath, const string& domain, const string& resource)
 {
-    SGPropertyNode* stringsNode = _defaultLocale->getNode(domain, 0, true)
-                                                ->getNode("strings", 0, true);
+    SGPropertyNode* domainNode = _defaultLocale->getNode(domain, 0, true);
+    SGPropertyNode* stringsNode = domainNode->getNode("strings", 0, true);
     SGPropertyNode* resourceNode = stringsNode->getNode(resource);
 
-    if (!resourceNode) {
+    const string path_str = resourceNode ? resourceNode->getStringValue() : "";
+
+    if (path_str.empty()) {
+        SG_LOG(SG_GENERAL, SG_WARN, "No path in " << stringsNode->getPath()
+               << " for resource '" << resource << "'.");
         return false;
-    } else if (resourceNode->getBoolValue("__loaded")) {
+    }
+
+    return loadResourceForDefaultTranslation(basePath / path_str, domain,
+                                             resource);
+}
+
+bool FGLocale::loadResourceForDefaultTranslation(
+    const SGPath& xmlFile, const std::string& domain,
+    const std::string& resource)
+{
+    SGPropertyNode* resourceNode = _defaultLocale->getNode(domain, 0, true)
+                                                 ->getNode("strings", 0, true)
+                                                 ->getNode(resource, 0, true);
+
+    if (resourceNode->getBoolValue("__loaded")) {
         // already loaded previously
         return true;
     }
 
-    const string path_str = resourceNode->getStringValue();
-    if (path_str.empty()) {
-        SG_LOG(SG_GENERAL, SG_WARN, "No path in " << stringsNode->getPath()
-               << " for resource '" << resource << "' in domain '"
-               << domain << "'.");
-        return false;
-    }
-
-    const SGPath path = basePath / path_str;
     SG_LOG(SG_GENERAL, SG_INFO, "Reading localized strings for " <<
            domain << "/" << resource << " in language '"
            << _defaultLocale->getStringValue("lang", "<none>")
-           <<"' from " << path);
+           <<"' from " << xmlFile);
 
     // load the actual file
     try {
-        readProperties(path, resourceNode);
+        readProperties(xmlFile, resourceNode);
     } catch (const sg_exception &e) {
         SG_LOG(SG_GENERAL, SG_ALERT,
-               "Unable to read the localized strings from " << path <<
+               "Unable to read the localized strings from " << xmlFile <<
                ". Error: " << e.getFormattedMessage());
         return false;
     }
